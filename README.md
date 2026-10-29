@@ -34,10 +34,13 @@ For a manual deployment, run the build command first, then the deploy command. N
 
 ## Features
 
-- 28 families covering curves, radial marks, geometry, weaving, and textures.
+- 29 families covering curves, radial marks, geometry, weaving, and textures.
 - Outline, solid, double-line, ribbon, and dashed treatments.
 - Nested layers, rotational copies, and overlays from every family with adjustable size and rotation.
 - Spiral arms, drifting swirls, damped harmonographs, and triangular lattices.
+- Rubber band loops built from circle tangents and arcs. Frequency sets grid rows;
+  Detail 1–4 selects free layouts, 5–8 mirrors one axis, and 9–12 mirrors both.
+  Phase changes the pin arrangement; Warp adjusts the pin radius.
 - Shareable URLs containing the seed, selected family, geometry, composition, colors, and export settings.
 - Static SVG downloads and PNG downloads at 1024, 2048, or 4096 pixels.
 - Transparent exports or the selected background. SVG files include the seed and settings in their metadata.

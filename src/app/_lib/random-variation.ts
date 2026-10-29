@@ -74,8 +74,8 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
     settings.rotation = Math.floor(random() * 8) * 45;
     settings.aspect = 1;
   }
-  // Stretching a radial cube arrangement breaks its rotational symmetry.
-  if (family === "cubes") settings.aspect = 1;
+  // Preserve the intended symmetry of these geometric layouts.
+  if (family === "cubes" || family === "rubber-band") settings.aspect = 1;
   const complexity = density(settings);
   const baseStroke = FINE_FAMILIES.includes(family)
     ? Math.max(0.5, 1.8 - complexity * 1.2)
@@ -86,7 +86,7 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
         10,
     ) / 10;
   settings.stroke = Math.max(0.5, Math.min(14, settings.stroke));
-  if (!logoFamily && complexity < 0.4 && style !== "solid" && random() < 0.22) {
+  if (!logoFamily && family !== "rubber-band" && complexity < 0.4 && style !== "solid" && random() < 0.22) {
     settings.layers = 2;
     settings.spacing = Math.round((0.1 + random() * 0.12) * 100) / 100;
   }

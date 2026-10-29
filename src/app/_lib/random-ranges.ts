@@ -20,6 +20,7 @@ export const RANDOM_RANGES: Record<FamilyId, { frequency: Range; detail: Range }
   shards: { frequency: [3, 14], detail: [1, 12] },
   star: { frequency: [3, 12], detail: [1, 12] },
   sun: { frequency: [4, 16], detail: [1, 9] },
+  "rubber-band": { frequency: [2, 7], detail: [1, 12] },
   offset: { frequency: [2, 6], detail: [1, 12] },
   cutout: { frequency: [3, 8], detail: [1, 12] },
   polygon: { frequency: [3, 12], detail: [3, 10] },

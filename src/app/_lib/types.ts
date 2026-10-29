@@ -23,6 +23,7 @@ export type FamilyId =
   | "star"
   | "sun"
   | "offset"
+  | "rubber-band"
   | "cutout"
   | "polygon"
   | "cross"
