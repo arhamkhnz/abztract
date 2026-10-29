@@ -6,13 +6,9 @@ import type { FamilyId, ShapeSettings, ShapeStyle } from "./types";
 
 const SIDE_MARGIN = 54;
 const VERTICAL_MARGIN = 36;
-const HEADER_HEIGHT = 34;
-const FOOTER_HEIGHT = 18;
-const CONTENT_GAP = 42;
-const GRID_HEIGHT = 630 - VERTICAL_MARGIN * 2 - HEADER_HEIGHT - FOOTER_HEIGHT - CONTENT_GAP * 2;
-const GRID_TOP = VERTICAL_MARGIN + HEADER_HEIGHT + CONTENT_GAP;
-const COLUMNS = 7;
-const CELL_WIDTH = (1200 - SIDE_MARGIN * 2) / COLUMNS;
+const GRID_HEIGHT = 630 - VERTICAL_MARGIN * 2;
+const GRID_TOP = VERTICAL_MARGIN;
+const ROWS = 4;
 
 type Specimen = readonly [family: FamilyId, seed: string, style?: ShapeStyle];
 
@@ -38,7 +34,13 @@ const specimens: Specimen[] = [
   ["cross", "snowflake", "double"],
   ["beads", "bubbles"],
   ["maze", "detour"],
+  ["orbit", "satellite"],
+  ["polygon", "origami"],
+  ["star", "stardust", "solid"],
 ];
+
+const COLUMNS = Math.ceil(specimens.length / ROWS);
+const CELL_WIDTH = (1200 - SIDE_MARGIN * 2) / COLUMNS;
 
 function specimenSheet() {
   const grid: string[] = [];
@@ -46,8 +48,8 @@ function specimenSheet() {
     const x = SIDE_MARGIN + column * CELL_WIDTH;
     grid.push(`<path d="M${x} ${GRID_TOP}V${GRID_TOP + GRID_HEIGHT}"/>`);
   }
-  for (let row = 0; row <= 3; row++) {
-    const y = GRID_TOP + row * (GRID_HEIGHT / 3);
+  for (let row = 0; row <= ROWS; row++) {
+    const y = GRID_TOP + row * (GRID_HEIGHT / ROWS);
     grid.push(`<path d="M${SIDE_MARGIN} ${y}H${1200 - SIDE_MARGIN}"/>`);
   }
 
@@ -65,7 +67,7 @@ function specimenSheet() {
         layers: ["wave", "super", "maze"].includes(family) ? 1 + Math.floor(random() * 2) : 1,
       };
       const x = SIDE_MARGIN + (index % COLUMNS) * CELL_WIDTH + (CELL_WIDTH - 128) / 2;
-      const y = GRID_TOP + (GRID_HEIGHT / 3 - 128) / 2 + Math.floor(index / COLUMNS) * (GRID_HEIGHT / 3);
+      const y = GRID_TOP + (GRID_HEIGHT / ROWS - 128) / 2 + Math.floor(index / COLUMNS) * (GRID_HEIGHT / ROWS);
       return `<g transform="translate(${x} ${y}) scale(0.256)" color="#a3a3a3">${renderSymbol(settings, `specimen-${index}`)}</g>`;
     })
     .join("");
@@ -89,49 +91,6 @@ export function createSocialImage() {
   return new ImageResponse(
     <div style={{ display: "flex", width: "100%", height: "100%", background: "#000000", color: "#ffffff" }}>
       <img src={source} width={1200} height={630} alt="" />
-      <div
-        style={{
-          display: "flex",
-          position: "absolute",
-          top: VERTICAL_MARGIN,
-          height: HEADER_HEIGHT,
-          lineHeight: "34px",
-          left: SIDE_MARGIN,
-          fontSize: 28,
-          fontWeight: 600,
-          letterSpacing: -1,
-        }}
-      >
-        abztract
-      </div>
-      <div
-        style={{
-          display: "flex",
-          position: "absolute",
-          bottom: VERTICAL_MARGIN,
-          height: FOOTER_HEIGHT,
-          lineHeight: "18px",
-          left: SIDE_MARGIN,
-          fontSize: 14,
-          color: "#737373",
-        }}
-      >
-        A playground for shapes.
-      </div>
-      <div
-        style={{
-          display: "flex",
-          position: "absolute",
-          bottom: VERTICAL_MARGIN,
-          height: FOOTER_HEIGHT,
-          lineHeight: "18px",
-          right: SIDE_MARGIN,
-          fontSize: 14,
-          color: "#737373",
-        }}
-      >
-        by arhamkhnz
-      </div>
     </div>,
     { width: 1200, height: 630 },
   );

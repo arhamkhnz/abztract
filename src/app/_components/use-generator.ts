@@ -3,9 +3,9 @@ import { useSearchParams } from "next/navigation";
 import { DialStore, useDialKitController } from "dialkit";
 import { DIAL_CONFIG, toShapeSettings, type GeneratorValues } from "../_lib/dial-config";
 import { FAMILIES, getFamily } from "../_lib/families";
-import { newSeed, seededRandom, settingsFromSeed } from "../_lib/seed";
+import { seededRandom, settingsFromSeed } from "../_lib/seed";
 import { createShareUrl, readGeneratorQuery } from "../_lib/url-state";
-import type { FamilyId } from "../_lib/types";
+import { randomVariation } from "../_lib/random-variation";
 
 const PANEL_ID = "abztract-generator";
 
@@ -22,20 +22,6 @@ export function useGenerator(onAction?: (action: string, values: GeneratorValues
   const previous = useRef({ seed: values.seed, family: values.shape.family });
   const settings = useMemo(() => toShapeSettings(values), [values]);
 
-  const selectFamily = useCallback(
-    (id: FamilyId, seed: string) => {
-      const family = getFamily(id);
-      previous.current = { seed, family: id };
-      setValues({
-        seed,
-        shape: { family: id, style: family.style, ...settingsFromSeed(seed, id) },
-        finish: { stroke: family.stroke },
-        composition: { layers: 1, copies: 1, rotation: 0, aspect: 1, overlay: "none" },
-      });
-    },
-    [setValues],
-  );
-
   const reset = useCallback(() => {
     const defaults = readGeneratorQuery(new URLSearchParams());
     previous.current = { seed: defaults.seed, family: defaults.shape.family };
@@ -45,13 +31,31 @@ export function useGenerator(onAction?: (action: string, values: GeneratorValues
 
   const vary = useCallback(() => {
     const current = getValues();
-    const seed = newSeed();
-    const candidates = FAMILIES.filter(({ id }) => id !== current.shape.family);
-    const family = current.keepFamily
-      ? getFamily(current.shape.family).id
-      : candidates[Math.floor(seededRandom(`family:${seed}`)() * candidates.length)].id;
-    selectFamily(family, seed);
-  }, [getValues, selectFamily]);
+    const { seed, settings: next } = randomVariation(toShapeSettings(current), current.keepFamily);
+    previous.current = { seed, family: next.family };
+    setValues({
+      seed,
+      shape: {
+        family: next.family,
+        style: next.style,
+        frequency: next.frequency,
+        detail: next.detail,
+        phase: next.phase,
+        warp: next.warp,
+      },
+      finish: { stroke: next.stroke },
+      composition: {
+        layers: next.layers,
+        spacing: next.spacing,
+        copies: next.copies,
+        rotation: next.rotation,
+        aspect: next.aspect,
+        overlay: next.overlay,
+        overlayScale: next.overlayScale,
+        overlayRotation: next.overlayRotation,
+      },
+    });
+  }, [getValues, setValues]);
 
   useEffect(() => {
     return DialStore.subscribeActions(PANEL_ID, (action) => {
