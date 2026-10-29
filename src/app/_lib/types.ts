@@ -6,9 +6,28 @@ export interface ShapePath {
 }
 
 export type FamilyId =
-  | "lissajous" | "spiro" | "rose" | "orbit" | "wave" | "super"
-  | "knot" | "weave" | "petals" | "pinwheel" | "shards" | "star" | "sun"
-  | "polygon" | "cross" | "maze" | "hex" | "cubes" | "rings" | "stripes" | "beads" | "chords";
+  | "lissajous"
+  | "spiro"
+  | "rose"
+  | "orbit"
+  | "wave"
+  | "super"
+  | "knot"
+  | "weave"
+  | "petals"
+  | "pinwheel"
+  | "shards"
+  | "star"
+  | "sun"
+  | "polygon"
+  | "cross"
+  | "maze"
+  | "hex"
+  | "cubes"
+  | "rings"
+  | "stripes"
+  | "beads"
+  | "chords";
 
 export type ShapeStyle = "outline" | "solid" | "double" | "woven" | "dashed";
 export type FamilyCategory = "curves" | "woven" | "radial" | "geometry" | "texture";

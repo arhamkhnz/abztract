@@ -8,7 +8,6 @@ import type { ExportFormat } from "../_lib/export";
 import { createShareUrl } from "../_lib/url-state";
 import { Artwork } from "./artwork";
 import { useGenerator } from "./use-generator";
-import styles from "./generator.module.css";
 
 export function Generator() {
   const { values, settings, ready } = useGenerator((action) => {
@@ -57,14 +56,52 @@ export function Generator() {
   if (!ready) return null;
 
   return (
-    <main className={styles.app} style={{ background: settings.background }} aria-label="Abztract shape generator">
-      <div className={styles.canvas}>
-        <Artwork settings={settings} svgRef={svgRef} className={styles.artwork} />
+    <main
+      className="relative min-h-svh"
+      style={{ background: settings.background }}
+      aria-label="Abztract shape generator"
+    >
+      <div className="grid min-h-svh place-items-center p-6">
+        <Artwork
+          settings={settings}
+          svgRef={svgRef}
+          className="block aspect-square h-auto w-[min(52vmin,560px,100%)] max-[760px]:w-[min(65vw,360px)]"
+        />
       </div>
-      <span className={styles.seed} style={{ color: settings.color }}>{values.seed}</span>
-      <DialRoot position="top-right" theme="dark" defaultOpen productionEnabled versions="menu" />
-      {error ? <p className={styles.notice} role="alert">{error}</p>
-        : <p className={styles.notice} role="status" aria-live="polite">{message}</p>}
+      <footer
+        className="fixed bottom-5 left-5 max-w-[calc(100vw-40px)] text-xs leading-relaxed"
+        style={{ color: settings.color }}
+      >
+        <p className="m-0">
+          <span className="opacity-60">Made by </span>
+          <a
+            href="https://github.com/arhamkhnz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline underline-offset-4 opacity-60 hover:opacity-100"
+          >
+            arhamkhnz
+          </a>
+          <span className="opacity-60">. The source code is available on </span>
+          <a
+            href="https://github.com/arhamkhnz/abztract"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium underline underline-offset-4 opacity-60 hover:opacity-100"
+          >
+            GitHub
+          </a>
+          <span className="opacity-60">.</span>
+        </p>
+      </footer>
+      <DialRoot mode="popover" position="top-right" theme="dark" defaultOpen productionEnabled versions="menu" />
+      <p
+        className="fixed bottom-20 left-5 m-0 max-w-[min(360px,calc(100vw-40px))] rounded-md bg-[#202020] text-xs leading-normal text-foreground"
+        role={error ? "alert" : "status"}
+        aria-live={error ? "assertive" : "polite"}
+      >
+        {error || message}
+      </p>
     </main>
   );
 }

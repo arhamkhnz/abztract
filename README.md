@@ -11,6 +11,14 @@ npm run dev
 
 Open [localhost:3000](http://localhost:3000). Select a family from the DialKit panel on the right, then adjust the shape, finish, and composition. A seed produces repeatable settings for the selected family; manual controls can refine them further. Disable **Keep family** to explore across families.
 
+## Static deployment
+
+```bash
+npm run build
+```
+
+Next.js exports the site to `out/`. Deploy that folder to a static host; no Node.js server is needed. `next start` does not support static exports. URL settings, shape generation, and SVG/PNG downloads continue to run in the browser.
+
 ## Features
 
 - 22 families covering curves, radial marks, geometry, weaving, and textures.
@@ -32,11 +40,11 @@ Links can start with just a seed and family, for example `/?seed=hello&family=kn
 
 Everything for the single route is colocated under `src/app`:
 
-- `_components`: minimal canvas, artwork, controller hook, and scoped styles.
+- `_components`: minimal canvas, artwork, controller hook, and Tailwind layouts.
 - `_lib/generators`: pure, typed generators grouped by shape category.
 - `_lib`: family definitions, seed algorithms, geometry helpers, rendering, DialKit configuration, URL state, and export utilities.
 
-`page.tsx` remains a Server Component. The generator is the client boundary. DialKit floats at the top right and stays available in production.
+`page.tsx` remains a Server Component. The generator is the client boundary. DialKit uses its native floating panel at the top right and stays available in production.
 
 ## Tooling
 

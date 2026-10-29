@@ -6,8 +6,28 @@ import { beads, chords, rings, stripes } from "./textures";
 import { knot, petals, weave } from "./woven";
 
 const generators: Record<FamilyId, ShapeGenerator> = {
-  lissajous, spiro, rose, orbit, wave, super: superShape, knot, weave, petals,
-  pinwheel, shards, star, sun, polygon: polygonRing, cross, maze, hex, cubes, rings, stripes, beads, chords,
+  lissajous,
+  spiro,
+  rose,
+  orbit,
+  wave,
+  super: superShape,
+  knot,
+  weave,
+  petals,
+  pinwheel,
+  shards,
+  star,
+  sun,
+  polygon: polygonRing,
+  cross,
+  maze,
+  hex,
+  cubes,
+  rings,
+  stripes,
+  beads,
+  chords,
 };
 
 export function generatePaths(settings: ShapeSettings) {

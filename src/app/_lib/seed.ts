@@ -12,7 +12,7 @@ function hashText(text: string): number {
 export function seededRandom(seed: string) {
   let value = hashText(seed);
   return () => {
-    value = (value + 0x6D2B79F5) | 0;
+    value = (value + 0x6d2b79f5) | 0;
     let result = Math.imul(value ^ (value >>> 15), 1 | value);
     result ^= result + Math.imul(result ^ (result >>> 7), 61 | result);
     return ((result ^ (result >>> 14)) >>> 0) / 4294967296;
@@ -21,10 +21,14 @@ export function seededRandom(seed: string) {
 
 export function settingsFromSeed(seed: string, family: FamilyId) {
   const random = seededRandom(`${family}:${seed}`);
-  const frequency = family === "weave" ? 2 + Math.floor(random() * 4)
-    : family === "hex" ? 3 + Math.floor(random() * 4)
-      : family === "cubes" ? 1 + Math.floor(random() * 6)
-        : 3 + Math.floor(random() * 10);
+  const frequency =
+    family === "weave"
+      ? 2 + Math.floor(random() * 4)
+      : family === "hex"
+        ? 3 + Math.floor(random() * 4)
+        : family === "cubes"
+          ? 1 + Math.floor(random() * 6)
+          : 3 + Math.floor(random() * 10);
 
   return {
     frequency,

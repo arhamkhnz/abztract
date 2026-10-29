@@ -49,7 +49,10 @@ async function rasterize(source: string, size: number): Promise<Blob> {
     if (!context) throw new Error("Your browser could not create a PNG canvas.");
     context.drawImage(image, 0, 0, size, size);
     return await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG export failed. Please try again.")), "image/png");
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject(new Error("PNG export failed. Please try again."))),
+        "image/png",
+      );
     });
   } finally {
     URL.revokeObjectURL(url);
@@ -60,8 +63,9 @@ export async function downloadArtwork(format: ExportFormat, options: ExportOptio
   const source = serialize(options);
   const seed = options.seed.replace(/[^a-z0-9_-]/gi, "-").slice(0, 40) || "shape";
   const filename = `abztract-${options.settings.family}-${seed}.${format}`;
-  const blob = format === "svg"
-    ? new Blob([source], { type: "image/svg+xml;charset=utf-8" })
-    : await rasterize(source, options.size);
+  const blob =
+    format === "svg"
+      ? new Blob([source], { type: "image/svg+xml;charset=utf-8" })
+      : await rasterize(source, options.size);
   download(blob, filename);
 }

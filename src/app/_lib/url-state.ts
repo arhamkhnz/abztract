@@ -20,10 +20,17 @@ function readNumber(params: URLSearchParams, key: string, config: SliderConfig, 
   return Number(Math.max(min, Math.min(max, min + Math.round((clamped - min) / step) * step)).toFixed(5));
 }
 
-function readSelect(params: URLSearchParams, key: string, config: SelectConfig, fallback = config.default ?? ""): string {
+function readSelect(
+  params: URLSearchParams,
+  key: string,
+  config: SelectConfig,
+  fallback = config.default ?? "",
+): string {
   const value = params.get(key);
-  return value !== null && config.options.some((option) => (typeof option === "string" ? option : option.value) === value)
-    ? value : fallback;
+  return value !== null &&
+    config.options.some((option) => (typeof option === "string" ? option : option.value) === value)
+    ? value
+    : fallback;
 }
 
 function readBoolean(params: URLSearchParams, key: string, fallback: boolean): boolean {

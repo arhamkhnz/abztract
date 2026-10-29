@@ -50,8 +50,9 @@ export const DIAL_CONFIG = {
       type: "select",
       options: [
         { value: "none", label: "None" },
-        ...FAMILIES.filter(({ id }) => ["rings", "star", "chords", "beads", "orbit", "hex"].includes(id))
-          .map(({ id, name }) => ({ value: id, label: name })),
+        ...FAMILIES.filter(({ id }) => ["rings", "star", "chords", "beads", "orbit", "hex"].includes(id)).map(
+          ({ id, name }) => ({ value: id, label: name }),
+        ),
       ],
       default: "none",
     },
