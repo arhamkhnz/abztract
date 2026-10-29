@@ -1,0 +1,51 @@
+.app {
+  min-height: 100svh;
+}
+
+.canvas {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.artwork {
+  display: block;
+  width: min(52vmin, 560px);
+  height: auto;
+  aspect-ratio: 1;
+}
+
+.seed {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  max-width: calc(100vw - 40px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  opacity: 0.35;
+}
+
+.notice {
+  position: fixed;
+  left: 20px;
+  bottom: 44px;
+  max-width: min(360px, calc(100vw - 40px));
+  margin: 0;
+  color: #d4d4d4;
+  background: #202020;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.notice:not(:empty) {
+  padding: 8px 12px;
+}
+
+@media (max-width: 600px) {
+  .artwork { width: min(76vw, 440px); }
+}

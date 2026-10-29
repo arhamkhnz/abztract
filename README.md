@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Abztract
 
-## Getting Started
+A single-page playground for generating abstract symbols from text seeds and adjustable geometry.
 
-First, run the development server:
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [localhost:3000](http://localhost:3000). Select a family from the DialKit panel on the right, then adjust the shape, finish, and composition. A seed produces repeatable settings for the selected family; manual controls can refine them further. Disable **Keep family** to explore across families.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- 22 families covering curves, radial marks, geometry, weaving, and textures.
+- Outline, solid, double-line, ribbon, and dashed treatments.
+- Nested layers, rotational copies, and optional overlays.
+- Shareable URLs containing the seed, selected family, geometry, composition, colors, and export settings.
+- Static SVG downloads and PNG downloads at 1024, 2048, or 4096 pixels.
+- Transparent exports or the selected background. SVG files include the seed and settings in their metadata.
 
-## Learn More
+Generation and exports run in the browser. There are no accounts, uploads, animation controls, or server APIs.
 
-To learn more about Next.js, take a look at the following resources:
+## Sharing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Use **Copy link** in DialKit or copy the browser address. Changes update the query string after a short debounce, without reloading the page or adding a history entry for each slider movement. **Copy link** captures current values immediately, even during that debounce.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Links can start with just a seed and family, for example `/?seed=hello&family=knot`. Missing geometry is derived from that seed; explicit settings in the URL take precedence. Numeric inputs are clamped to the supported ranges, and invalid selections or colors fall back to valid defaults. Opening a link or navigating back/forward restores its settings.
 
-## Deploy on Vercel
+## Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Everything for the single route is colocated under `src/app`:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `_components`: minimal canvas, artwork, controller hook, and scoped styles.
+- `_lib/generators`: pure, typed generators grouped by shape category.
+- `_lib`: family definitions, seed algorithms, geometry helpers, rendering, DialKit configuration, URL state, and export utilities.
+
+`page.tsx` remains a Server Component. The generator is the client boundary. DialKit floats at the top right and stays available in production.
+
+## Tooling
+
+Oxlint rules and Oxfmt settings follow [TenderLayer](https://github.com/arhamkhnz/tenderlayer), with paths adapted for this Next.js app.
+
+```bash
+npm run lint
+npm run lint:fix
+npm run format
+npm run format:check
+```
+
+These scripts are available for manual use; creating this implementation does not run them.
