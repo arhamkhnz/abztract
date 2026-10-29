@@ -1,6 +1,5 @@
 import type { DialConfig, ResolvedValues } from "dialkit";
 import { DEFAULT_SETTINGS, FAMILIES, getFamily } from "./families";
-import { settingsFromSeed } from "./seed";
 import type { ShapeSettings, ShapeStyle } from "./types";
 
 export const STYLE_OPTIONS: { value: ShapeStyle; label: string }[] = [
@@ -12,7 +11,6 @@ export const STYLE_OPTIONS: { value: ShapeStyle; label: string }[] = [
 ];
 
 const INITIAL_SEED = "abztract";
-const initialGeometry = settingsFromSeed(INITIAL_SEED, DEFAULT_SETTINGS.family);
 
 export const DIAL_CONFIG = {
   randomize: { type: "action", label: "Randomize" },
@@ -29,10 +27,10 @@ export const DIAL_CONFIG = {
       default: DEFAULT_SETTINGS.family,
     },
     style: { type: "select", options: STYLE_OPTIONS, default: DEFAULT_SETTINGS.style },
-    frequency: [initialGeometry.frequency, 1, 16, 1],
-    detail: [initialGeometry.detail, 1, 12, 1],
-    phase: [initialGeometry.phase, 0, 360, 1],
-    warp: [initialGeometry.warp, 0, 0.8, 0.01],
+    frequency: [DEFAULT_SETTINGS.frequency, 1, 16, 1],
+    detail: [DEFAULT_SETTINGS.detail, 1, 12, 1],
+    phase: [DEFAULT_SETTINGS.phase, 0, 360, 1],
+    warp: [DEFAULT_SETTINGS.warp, 0, 0.8, 0.01],
   },
   finish: {
     stroke: [DEFAULT_SETTINGS.stroke, 0.5, 14, 0.1],
@@ -45,7 +43,7 @@ export const DIAL_CONFIG = {
     layers: [1, 1, 4, 1],
     spacing: [0.14, 0.05, 0.28, 0.01],
     copies: [1, 1, 6, 1],
-    rotation: [0, 0, 360, 1],
+    rotation: [DEFAULT_SETTINGS.rotation, 0, 360, 1],
     aspect: [1, 0.4, 1.6, 0.01],
     overlay: {
       type: "select",

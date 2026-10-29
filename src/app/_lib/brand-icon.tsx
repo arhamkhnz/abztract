@@ -21,7 +21,6 @@ const logo: ShapeSettings = {
   background: "#000000",
 };
 
-
 export function createLogoSvg() {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="500" viewBox="0 0 500 500" color="#ffffff" role="img" aria-label="Abztract"><rect width="500" height="500" fill="#000000"/>${renderSymbol(logo, "abztract-icon")}</svg>`;
 }

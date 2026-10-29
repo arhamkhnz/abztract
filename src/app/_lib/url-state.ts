@@ -1,6 +1,6 @@
 import type { SelectConfig } from "dialkit";
 import { DIAL_CONFIG, type GeneratorValues } from "./dial-config";
-import { getFamily } from "./families";
+import { DEFAULT_SETTINGS, getFamily } from "./families";
 import { settingsFromSeed } from "./seed";
 
 type SharedGeneratorState = Pick<GeneratorValues, "seed" | "keepFamily" | "shape" | "finish"> & {
@@ -50,21 +50,33 @@ function readColor(params: URLSearchParams, key: string, fallback: string): stri
 export function readGeneratorQuery(params: URLSearchParams): SharedGeneratorState {
   const seed = params.get("seed") ?? DIAL_CONFIG.seed.default;
   const family = getFamily(readSelect(params, "family", DIAL_CONFIG.shape.family));
-  const geometry = settingsFromSeed(seed, family.id);
+  const isDefaultFamily = family.id === DEFAULT_SETTINGS.family;
+  const geometry =
+    seed === DIAL_CONFIG.seed.default && isDefaultFamily ? DEFAULT_SETTINGS : settingsFromSeed(seed, family.id);
 
   return {
     seed,
     keepFamily: readBoolean(params, "keepFamily", DIAL_CONFIG.keepFamily),
     shape: {
       family: family.id,
-      style: readSelect(params, "style", DIAL_CONFIG.shape.style, family.style),
+      style: readSelect(
+        params,
+        "style",
+        DIAL_CONFIG.shape.style,
+        isDefaultFamily ? DEFAULT_SETTINGS.style : family.style,
+      ),
       frequency: readNumber(params, "frequency", DIAL_CONFIG.shape.frequency, geometry.frequency),
       detail: readNumber(params, "detail", DIAL_CONFIG.shape.detail, geometry.detail),
       phase: readNumber(params, "phase", DIAL_CONFIG.shape.phase, geometry.phase),
       warp: readNumber(params, "warp", DIAL_CONFIG.shape.warp, geometry.warp),
     },
     finish: {
-      stroke: readNumber(params, "stroke", DIAL_CONFIG.finish.stroke, family.stroke),
+      stroke: readNumber(
+        params,
+        "stroke",
+        DIAL_CONFIG.finish.stroke,
+        isDefaultFamily ? DEFAULT_SETTINGS.stroke : family.stroke,
+      ),
       color: readColor(params, "color", DIAL_CONFIG.finish.color.default),
       background: readColor(params, "background", DIAL_CONFIG.finish.background.default),
       lineEnds: readSelect(params, "cap", DIAL_CONFIG.finish.lineEnds),
