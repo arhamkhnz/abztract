@@ -13,6 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://abztract.arhamkhnz.com"),
+  openGraph: { type: "website", siteName: "Abztract" },
+  twitter: { card: "summary_large_image" },
   title: "Abztract — Make a mark",
   description: "Create abstract symbols from a seed. Explore shapes, tune the details, and download SVG or PNG.",
 };
