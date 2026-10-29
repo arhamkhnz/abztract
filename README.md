@@ -19,6 +19,19 @@ npm run build
 
 Next.js exports the site to `out/`. Deploy that folder to a static host; no Node.js server is needed. `next start` does not support static exports. URL settings, shape generation, and SVG/PNG downloads continue to run in the browser.
 
+### Cloudflare Workers
+
+The root `wrangler.jsonc` configures Workers Static Assets to serve `out/`.
+
+For Git-connected Workers builds, use:
+
+| Setting | Value |
+| --- | --- |
+| Build command | `npm run build` |
+| Deploy command | `npx wrangler deploy` |
+
+For a manual deployment, run the build command first, then the deploy command. No Worker script or OpenNext adapter is required.
+
 ## Features
 
 - 22 families covering curves, radial marks, geometry, weaving, and textures.
