@@ -25,9 +25,9 @@ The root `wrangler.jsonc` configures Workers Static Assets to serve `out/`.
 
 For Git-connected Workers builds, use:
 
-| Setting | Value |
-| --- | --- |
-| Build command | `npm run build` |
+| Setting        | Value                 |
+| -------------- | --------------------- |
+| Build command  | `npm run build`       |
 | Deploy command | `npx wrangler deploy` |
 
 For a manual deployment, run the build command first, then the deploy command. No Worker script or OpenNext adapter is required.

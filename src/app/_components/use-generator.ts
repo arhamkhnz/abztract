@@ -17,6 +17,7 @@ export function useGenerator(onAction?: (action: string) => void) {
     defaultCollapsed: false,
     onAction(action) {
       if (action === "randomize") vary();
+      else if (action === "reset") reset();
       else onAction?.(action);
     },
   });
@@ -33,6 +34,13 @@ export function useGenerator(onAction?: (action: string) => void) {
       finish: { stroke: family.stroke },
       composition: { layers: 1, copies: 1, rotation: 0, aspect: 1, overlay: "none" },
     });
+  }
+
+  function reset() {
+    const defaults = readGeneratorQuery(new URLSearchParams());
+    previous.current = { seed: defaults.seed, family: defaults.shape.family };
+    pendingRestore.current = createShareUrl(window.location.href, defaults).search;
+    setValues(defaults);
   }
 
   function vary() {

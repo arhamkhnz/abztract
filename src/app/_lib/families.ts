@@ -304,7 +304,7 @@ export const DEFAULT_SETTINGS: ShapeSettings = {
   rotation: 0,
   overlay: "none",
   cap: "round",
-  color: "#d4d4d4",
+  color: "#ffffff",
   background: "#000000",
 };
 

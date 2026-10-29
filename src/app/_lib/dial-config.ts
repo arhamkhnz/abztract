@@ -16,6 +16,7 @@ const initialGeometry = settingsFromSeed(INITIAL_SEED, DEFAULT_SETTINGS.family);
 
 export const DIAL_CONFIG = {
   randomize: { type: "action", label: "Randomize" },
+  reset: { type: "action", label: "Reset" },
   copyLink: { type: "action", label: "Copy link" },
   downloadSVG: { type: "action", label: "Download SVG" },
   downloadPNG: { type: "action", label: "Download PNG" },
