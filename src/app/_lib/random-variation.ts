@@ -19,6 +19,7 @@ const LINE_FAMILIES: FamilyId[] = [
   "stripes",
   "chords",
 ];
+const LOGO_FAMILIES: FamilyId[] = ["offset", "cutout"];
 const FINE_FAMILIES: FamilyId[] = ["spiral", "swirl", "harmonograph", "lattice", "chords"];
 
 function density(settings: ShapeSettings) {
@@ -38,6 +39,10 @@ function geometryDifference(a: ShapeSettings, b: ShapeSettings) {
   const frequency = Math.abs(a.frequency - b.frequency) / Math.max(1, ranges.frequency[1] - ranges.frequency[0]);
   const detail = Math.abs(a.detail - b.detail) / Math.max(1, ranges.detail[1] - ranges.detail[0]);
   const warp = Math.abs(a.warp - b.warp) / 0.8;
+  if (LOGO_FAMILIES.includes(a.family)) {
+    const changedMotif = Math.floor((a.detail - 1) / 3) !== Math.floor((b.detail - 1) / 3);
+    return frequency * 0.35 + (changedMotif ? 0.4 : 0) + detail * 0.1 + warp * 0.15;
+  }
   // Ignore rotation/phase: merely turning a similar silhouette should not qualify as new geometry.
   return frequency * 0.55 + detail * 0.2 + warp * 0.25;
 }
@@ -45,9 +50,12 @@ function geometryDifference(a: ShapeSettings, b: ShapeSettings) {
 function variationFromSeed(seed: string, family: FamilyId, current: ShapeSettings): ShapeSettings {
   const random = seededRandom(`appearance:${family}:${seed}`);
   const definition = getFamily(family);
-  const styles: ShapeStyle[] = LINE_FAMILIES.includes(family)
-    ? ["outline", "outline", "outline", "double", "dashed"]
-    : ["outline", "outline", "solid", "solid", "double"];
+  const logoFamily = LOGO_FAMILIES.includes(family);
+  const styles: ShapeStyle[] = logoFamily
+    ? ["solid", "solid", "solid", "outline", "double"]
+    : LINE_FAMILIES.includes(family)
+      ? ["outline", "outline", "outline", "double", "dashed"]
+      : ["outline", "outline", "solid", "solid", "double"];
   const style = random() < 0.45 ? definition.style : styles[Math.floor(random() * styles.length)];
   const geometry = settingsFromSeed(seed, family);
   const settings: ShapeSettings = {
@@ -61,17 +69,24 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
     rotation: Math.floor(random() * 360),
     aspect: random() < 0.25 ? Math.round((0.85 + random() * 0.3) * 100) / 100 : 1,
   };
+  if (logoFamily) {
+    settings.phase = 0;
+    settings.rotation = Math.floor(random() * 8) * 45;
+    settings.aspect = 1;
+  }
+  // Stretching a radial cube arrangement breaks its rotational symmetry.
+  if (family === "cubes") settings.aspect = 1;
   const complexity = density(settings);
   const baseStroke = FINE_FAMILIES.includes(family)
     ? Math.max(0.5, 1.8 - complexity * 1.2)
-    : definition.stroke * Math.max(0.6, 1.1 - complexity * 0.5);
+    : (logoFamily ? 5 : definition.stroke) * Math.max(0.6, 1.1 - complexity * 0.5);
   settings.stroke =
     Math.round(
       (style === "solid" ? 1 : style === "double" ? Math.min(3, baseStroke) : baseStroke * (0.75 + random() * 0.5)) *
         10,
     ) / 10;
   settings.stroke = Math.max(0.5, Math.min(14, settings.stroke));
-  if (complexity < 0.4 && style !== "solid" && random() < 0.22) {
+  if (!logoFamily && complexity < 0.4 && style !== "solid" && random() < 0.22) {
     settings.layers = 2;
     settings.spacing = Math.round((0.1 + random() * 0.12) * 100) / 100;
   }

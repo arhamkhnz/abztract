@@ -109,7 +109,7 @@ export const hex: ShapeGenerator = ({ frequency, detail, phase, warp }) => {
 };
 
 export const cubes: ShapeGenerator = ({ frequency, detail, phase, warp }) => {
-  const count = Math.min(8, frequency);
+  const count = Math.max(1, Math.round(frequency));
   const size = 0.25 + detail * 0.025;
   const radius = count === 1 ? 0 : 0.36 + warp * 0.5;
   const paths: ShapePath[] = [];
@@ -120,7 +120,8 @@ export const cubes: ShapeGenerator = ({ frequency, detail, phase, warp }) => {
     const vertices = Array.from({ length: 6 }, (_, vertex): Point => {
       const [x, y] = rotate(
         [size * Math.cos(Math.PI / 6 + (vertex * TAU) / 6), size * Math.sin(Math.PI / 6 + (vertex * TAU) / 6)],
-        ((phase * Math.PI) / 180) * 0.35,
+        // Rotate the module with its centre so every sector has identical geometry.
+        angle + Math.PI / 2 + ((phase * Math.PI) / 180) * 0.35,
       );
       return [center[0] + x, center[1] + y];
     });

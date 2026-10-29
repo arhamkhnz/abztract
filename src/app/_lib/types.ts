@@ -22,6 +22,8 @@ export type FamilyId =
   | "shards"
   | "star"
   | "sun"
+  | "offset"
+  | "cutout"
   | "polygon"
   | "cross"
   | "maze"

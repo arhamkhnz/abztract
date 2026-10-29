@@ -34,7 +34,7 @@ For a manual deployment, run the build command first, then the deploy command. N
 
 ## Features
 
-- 26 families covering curves, radial marks, geometry, weaving, and textures.
+- 28 families covering curves, radial marks, geometry, weaving, and textures.
 - Outline, solid, double-line, ribbon, and dashed treatments.
 - Nested layers, rotational copies, and overlays from every family with adjustable size and rotation.
 - Spiral arms, drifting swirls, damped harmonographs, and triangular lattices.
