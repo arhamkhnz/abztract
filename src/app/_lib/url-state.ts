@@ -5,7 +5,7 @@ import { settingsFromSeed } from "./seed";
 
 type SharedGeneratorState = Pick<GeneratorValues, "seed" | "keepFamily" | "shape" | "finish"> & {
   composition: Omit<GeneratorValues["composition"], "_collapsed">;
-  export: Omit<GeneratorValues["export"], "_collapsed">;
+  export: Pick<GeneratorValues["export"], "transparent" | "pngSize">;
 };
 
 type SliderConfig = readonly [number, number, number, number?];
@@ -88,6 +88,8 @@ export function readGeneratorQuery(params: URLSearchParams): SharedGeneratorStat
       rotation: readNumber(params, "rotation", DIAL_CONFIG.composition.rotation),
       aspect: readNumber(params, "aspect", DIAL_CONFIG.composition.aspect),
       overlay: readSelect(params, "overlay", DIAL_CONFIG.composition.overlay),
+      overlayScale: readNumber(params, "overlayScale", DIAL_CONFIG.composition.overlayScale),
+      overlayRotation: readNumber(params, "overlayRotation", DIAL_CONFIG.composition.overlayRotation),
     },
     export: {
       transparent: readBoolean(params, "transparent", DIAL_CONFIG.export.transparent),
@@ -116,6 +118,8 @@ export function createShareUrl(href: string, values: SharedGeneratorState): URL 
     rotation: values.composition.rotation,
     aspect: values.composition.aspect,
     overlay: values.composition.overlay,
+    overlayScale: values.composition.overlayScale,
+    overlayRotation: values.composition.overlayRotation,
     keepFamily: values.keepFamily ? "1" : "0",
     transparent: values.export.transparent ? "1" : "0",
     size: values.export.pngSize,

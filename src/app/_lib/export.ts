@@ -37,12 +37,20 @@ function download(blob: Blob, filename: string) {
 }
 
 async function rasterize(source: string, size: number): Promise<Blob> {
+  if (![1024, 2048, 4096].includes(size)) {
+    throw new Error("Choose a supported PNG size: 1024, 2048, or 4096 pixels.");
+  }
+
   const url = URL.createObjectURL(new Blob([source], { type: "image/svg+xml;charset=utf-8" }));
+  const canvas = document.createElement("canvas");
+  const image = new Image();
   try {
-    const image = new Image();
     image.src = url;
-    await image.decode();
-    const canvas = document.createElement("canvas");
+    try {
+      await image.decode();
+    } catch {
+      throw new Error("Your browser could not render this shape as a PNG. Try downloading the SVG instead.");
+    }
     canvas.width = size;
     canvas.height = size;
     const context = canvas.getContext("2d");
@@ -55,8 +63,16 @@ async function rasterize(source: string, size: number): Promise<Blob> {
       );
     });
   } finally {
+    image.removeAttribute("src");
     URL.revokeObjectURL(url);
+    // Release the large pixel buffer after encoding, including failed exports.
+    canvas.width = 0;
+    canvas.height = 0;
   }
+}
+
+export async function copyArtworkSvg(options: ExportOptions) {
+  await navigator.clipboard.writeText(serialize(options));
 }
 
 export async function downloadArtwork(format: ExportFormat, options: ExportOptions) {

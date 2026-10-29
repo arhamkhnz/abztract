@@ -1,55 +1,65 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { useDialKitController } from "dialkit";
-import { DIAL_CONFIG, toShapeSettings } from "../_lib/dial-config";
+import { DialStore, useDialKitController } from "dialkit";
+import { DIAL_CONFIG, toShapeSettings, type GeneratorValues } from "../_lib/dial-config";
 import { FAMILIES, getFamily } from "../_lib/families";
 import { newSeed, seededRandom, settingsFromSeed } from "../_lib/seed";
 import { createShareUrl, readGeneratorQuery } from "../_lib/url-state";
 import type { FamilyId } from "../_lib/types";
 
-export function useGenerator(onAction?: (action: string) => void) {
+const PANEL_ID = "abztract-generator";
+
+export function useGenerator(onAction?: (action: string, values: GeneratorValues) => void) {
   const query = useSearchParams().toString();
   const lastQuery = useRef<string | null>(null);
   const pendingRestore = useRef<string | null>(null);
   const [ready, setReady] = useState(false);
   const dial = useDialKitController("Abztract", DIAL_CONFIG, {
-    id: "abztract-generator",
+    id: PANEL_ID,
     defaultCollapsed: false,
-    onAction(action) {
-      if (action === "randomize") vary();
-      else if (action === "reset") reset();
-      else onAction?.(action);
-    },
   });
-  const { values, setValues } = dial;
+  const { values, setValues, getValues } = dial;
   const previous = useRef({ seed: values.seed, family: values.shape.family });
   const settings = useMemo(() => toShapeSettings(values), [values]);
 
-  function selectFamily(id: FamilyId, seed = values.seed) {
-    const family = getFamily(id);
-    previous.current = { seed, family: id };
-    setValues({
-      seed,
-      shape: { family: id, style: family.style, ...settingsFromSeed(seed, id) },
-      finish: { stroke: family.stroke },
-      composition: { layers: 1, copies: 1, rotation: 0, aspect: 1, overlay: "none" },
-    });
-  }
+  const selectFamily = useCallback(
+    (id: FamilyId, seed: string) => {
+      const family = getFamily(id);
+      previous.current = { seed, family: id };
+      setValues({
+        seed,
+        shape: { family: id, style: family.style, ...settingsFromSeed(seed, id) },
+        finish: { stroke: family.stroke },
+        composition: { layers: 1, copies: 1, rotation: 0, aspect: 1, overlay: "none" },
+      });
+    },
+    [setValues],
+  );
 
-  function reset() {
+  const reset = useCallback(() => {
     const defaults = readGeneratorQuery(new URLSearchParams());
     previous.current = { seed: defaults.seed, family: defaults.shape.family };
     pendingRestore.current = createShareUrl(window.location.href, defaults).search;
     setValues(defaults);
-  }
+  }, [setValues]);
 
-  function vary() {
+  const vary = useCallback(() => {
+    const current = getValues();
     const seed = newSeed();
-    const family = values.keepFamily
-      ? settings.family
-      : FAMILIES[Math.floor(seededRandom(seed)() * FAMILIES.length)].id;
+    const candidates = FAMILIES.filter(({ id }) => id !== current.shape.family);
+    const family = current.keepFamily
+      ? getFamily(current.shape.family).id
+      : candidates[Math.floor(seededRandom(`family:${seed}`)() * candidates.length)].id;
     selectFamily(family, seed);
-  }
+  }, [getValues, selectFamily]);
+
+  useEffect(() => {
+    return DialStore.subscribeActions(PANEL_ID, (action) => {
+      if (action === "randomize") vary();
+      else if (action === "reset") reset();
+      else onAction?.(action, getValues());
+    });
+  }, [getValues, onAction, reset, vary]);
 
   useEffect(() => {
     // Restore explicit URL settings before deriving anything from the seed. This also handles navigation.

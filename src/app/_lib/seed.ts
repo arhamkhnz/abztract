@@ -1,3 +1,5 @@
+import { greatestCommonDivisor } from "./geometry";
+import { RANDOM_RANGES } from "./random-ranges";
 import type { FamilyId } from "./types";
 
 function hashText(text: string): number {
@@ -21,20 +23,21 @@ export function seededRandom(seed: string) {
 
 export function settingsFromSeed(seed: string, family: FamilyId) {
   const random = seededRandom(`${family}:${seed}`);
-  const frequency =
-    family === "weave"
-      ? 2 + Math.floor(random() * 4)
-      : family === "hex"
-        ? 3 + Math.floor(random() * 4)
-        : family === "cubes"
-          ? 1 + Math.floor(random() * 6)
-          : 3 + Math.floor(random() * 10);
+  const ranges = RANDOM_RANGES[family];
+  const integer = (min: number, max: number) => min + Math.floor(random() * (max - min + 1));
+  const frequency = integer(...ranges.frequency);
+  let details = Array.from({ length: ranges.detail[1] - ranges.detail[0] + 1 }, (_, index) => ranges.detail[0] + index);
+
+  // Coprime rhythms avoid repeatedly tracing the same simpler curve.
+  if (family === "lissajous" || family === "spiro" || family === "harmonograph") {
+    details = details.filter((detail) => detail !== frequency && greatestCommonDivisor(frequency, detail) === 1);
+  }
 
   return {
     frequency,
-    detail: 1 + Math.floor(random() * (family === "hex" ? 2 : 6)),
-    phase: Math.floor(random() * 360),
-    warp: Math.round(random() * 70) / 100,
+    detail: details[integer(0, details.length - 1)],
+    phase: integer(0, 359),
+    warp: integer(0, 80) / 100,
   };
 }
 

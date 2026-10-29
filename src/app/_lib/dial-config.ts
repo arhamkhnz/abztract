@@ -16,8 +16,7 @@ export const DIAL_CONFIG = {
   randomize: { type: "action", label: "Randomize" },
   reset: { type: "action", label: "Reset" },
   copyLink: { type: "action", label: "Copy link" },
-  downloadSVG: { type: "action", label: "Download SVG" },
-  downloadPNG: { type: "action", label: "Download PNG" },
+  copySVG: { type: "action", label: "Copy SVG" },
   seed: { type: "text", default: INITIAL_SEED, placeholder: "A word, name, or anything…" },
   keepFamily: true as boolean,
   shape: {
@@ -47,19 +46,18 @@ export const DIAL_CONFIG = {
     aspect: [1, 0.4, 1.6, 0.01],
     overlay: {
       type: "select",
-      options: [
-        { value: "none", label: "None" },
-        ...FAMILIES.filter(({ id }) => ["rings", "star", "chords", "beads", "orbit", "hex"].includes(id)).map(
-          ({ id, name }) => ({ value: id, label: name }),
-        ),
-      ],
+      options: [{ value: "none", label: "None" }, ...FAMILIES.map(({ id, name }) => ({ value: id, label: name }))],
       default: "none",
     },
+    overlayScale: [0.62, 0.1, 1, 0.01],
+    overlayRotation: [0, 0, 360, 1],
   },
   export: {
-    _collapsed: true,
+    _collapsed: false,
     transparent: true as boolean,
     pngSize: { type: "select", options: ["1024", "2048", "4096"], default: "2048" },
+    downloadSVG: { type: "action", label: "Download SVG" },
+    downloadPNG: { type: "action", label: "Download PNG" },
   },
 } satisfies DialConfig;
 
@@ -81,6 +79,8 @@ export function toShapeSettings(values: GeneratorValues): ShapeSettings {
     copies: Math.round(values.composition.copies),
     rotation: values.composition.rotation,
     overlay: values.composition.overlay === "none" ? "none" : getFamily(values.composition.overlay).id,
+    overlayScale: values.composition.overlayScale,
+    overlayRotation: values.composition.overlayRotation,
     cap: cap === "butt" || cap === "square" ? cap : "round",
     color: values.finish.color,
     background: values.finish.background,

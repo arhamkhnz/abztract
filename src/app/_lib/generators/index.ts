@@ -1,13 +1,18 @@
 import type { FamilyId, ShapeGenerator, ShapeSettings } from "../types";
 import { lissajous, orbit, rose, spiro, superShape, wave } from "./curves";
 import { cross, cubes, hex, maze, polygonRing } from "./geometric";
+import { lattice } from "./lattice";
 import { pinwheel, shards, star, sun } from "./radial";
+import { spiral, swirl, harmonograph } from "./spirals";
 import { beads, chords, rings, stripes } from "./textures";
 import { knot, petals, weave } from "./woven";
 
 const generators: Record<FamilyId, ShapeGenerator> = {
   lissajous,
   spiro,
+  spiral,
+  swirl,
+  harmonograph,
   rose,
   orbit,
   wave,
@@ -22,6 +27,7 @@ const generators: Record<FamilyId, ShapeGenerator> = {
   polygon: polygonRing,
   cross,
   maze,
+  lattice,
   hex,
   cubes,
   rings,

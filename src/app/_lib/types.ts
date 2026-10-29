@@ -8,6 +8,9 @@ export interface ShapePath {
 export type FamilyId =
   | "lissajous"
   | "spiro"
+  | "spiral"
+  | "swirl"
+  | "harmonograph"
   | "rose"
   | "orbit"
   | "wave"
@@ -22,6 +25,7 @@ export type FamilyId =
   | "polygon"
   | "cross"
   | "maze"
+  | "lattice"
   | "hex"
   | "cubes"
   | "rings"
@@ -46,6 +50,8 @@ export interface ShapeSettings {
   copies: number;
   rotation: number;
   overlay: FamilyId | "none";
+  overlayScale: number;
+  overlayRotation: number;
   cap: "round" | "butt" | "square";
   color: string;
   background: string;

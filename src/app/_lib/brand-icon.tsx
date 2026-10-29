@@ -16,6 +16,8 @@ const logo: ShapeSettings = {
   copies: 1,
   rotation: 15,
   overlay: "none",
+  overlayScale: 0.62,
+  overlayRotation: 0,
   cap: "round",
   color: "#ffffff",
   background: "#000000",

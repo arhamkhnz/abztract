@@ -34,9 +34,10 @@ For a manual deployment, run the build command first, then the deploy command. N
 
 ## Features
 
-- 22 families covering curves, radial marks, geometry, weaving, and textures.
+- 26 families covering curves, radial marks, geometry, weaving, and textures.
 - Outline, solid, double-line, ribbon, and dashed treatments.
-- Nested layers, rotational copies, and optional overlays.
+- Nested layers, rotational copies, and overlays from every family with adjustable size and rotation.
+- Spiral arms, drifting swirls, damped harmonographs, and triangular lattices.
 - Shareable URLs containing the seed, selected family, geometry, composition, colors, and export settings.
 - Static SVG downloads and PNG downloads at 1024, 2048, or 4096 pixels.
 - Transparent exports or the selected background. SVG files include the seed and settings in their metadata.

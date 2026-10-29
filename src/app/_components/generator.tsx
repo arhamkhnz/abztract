@@ -3,55 +3,68 @@
 import { DialRoot } from "dialkit";
 import "dialkit/styles.css";
 import { useRef, useState } from "react";
-import { downloadArtwork } from "../_lib/export";
+import { copyArtworkSvg, downloadArtwork } from "../_lib/export";
 import type { ExportFormat } from "../_lib/export";
+import { toShapeSettings, type GeneratorValues } from "../_lib/dial-config";
 import { createShareUrl } from "../_lib/url-state";
 import { Artwork } from "./artwork";
 import { useGenerator } from "./use-generator";
 
 export function Generator() {
-  const { values, settings, ready } = useGenerator((action) => {
-    if (action === "copyLink") void copyLink();
-    if (action === "downloadSVG") void handleDownload("svg");
-    if (action === "downloadPNG") void handleDownload("png");
-  });
   const svgRef = useRef<SVGSVGElement>(null);
   const exportingRef = useRef(false);
-  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function copyLink() {
+  async function copyLink(values: GeneratorValues) {
     setError("");
-    setMessage("");
     try {
       await navigator.clipboard.writeText(createShareUrl(window.location.href, values).href);
-      setMessage("Link copied.");
     } catch {
       setError("Could not copy the link. You can copy it from the address bar.");
     }
   }
 
-  async function handleDownload(format: ExportFormat) {
+  async function copySvg(values: GeneratorValues) {
+    if (!svgRef.current) return;
+    setError("");
+    try {
+      await copyArtworkSvg({
+        svg: svgRef.current,
+        seed: values.seed,
+        settings: toShapeSettings(values),
+        transparent: values.export.transparent,
+        size: Number(values.export.pngSize),
+      });
+    } catch {
+      setError("Could not copy the SVG. Try downloading it instead.");
+    }
+  }
+
+  async function handleDownload(format: ExportFormat, values: GeneratorValues) {
     if (!svgRef.current || exportingRef.current) return;
     exportingRef.current = true;
     setError("");
-    setMessage("Preparing download…");
     try {
       await downloadArtwork(format, {
         svg: svgRef.current,
         seed: values.seed,
-        settings,
+        settings: toShapeSettings(values),
         transparent: values.export.transparent,
         size: Number(values.export.pngSize),
       });
-      setMessage(`${format.toUpperCase()} download ready.`);
     } catch (cause) {
-      setMessage("");
       setError(cause instanceof Error ? cause.message : "The download failed. Please try again.");
     } finally {
       exportingRef.current = false;
     }
   }
+
+  const { settings, ready } = useGenerator((action, currentValues) => {
+    if (action === "copyLink") void copyLink(currentValues);
+    if (action === "copySVG") void copySvg(currentValues);
+    if (action === "export.downloadSVG") void handleDownload("svg", currentValues);
+    if (action === "export.downloadPNG") void handleDownload("png", currentValues);
+  });
 
   if (!ready) return null;
 
@@ -95,13 +108,14 @@ export function Generator() {
         </p>
       </footer>
       <DialRoot mode="popover" position="top-right" theme="dark" defaultOpen productionEnabled versions="menu" />
-      <p
-        className="fixed bottom-20 left-5 m-0 max-w-[min(360px,calc(100vw-40px))] rounded-md bg-[#202020] text-xs leading-normal text-foreground"
-        role={error ? "alert" : "status"}
-        aria-live={error ? "assertive" : "polite"}
-      >
-        {error || message}
-      </p>
+      {error && (
+        <p
+          className="fixed bottom-20 left-5 m-0 max-w-[min(360px,calc(100vw-40px))] rounded-md bg-[#202020] text-xs leading-normal text-foreground"
+          role="alert"
+        >
+          {error}
+        </p>
+      )}
     </main>
   );
 }
