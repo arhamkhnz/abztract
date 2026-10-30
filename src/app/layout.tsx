@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: SITE.title,
   description: SITE.description,
   applicationName: SITE.name,
+  icons: {
+    // Preserve the file-based SVG favicon and add a PNG alternative.
+    other: [{ rel: "icon", url: "/icons/icon-128.png", sizes: "128x128", type: "image/png" }],
+  },
   authors: [{ name: SITE.author, url: SITE.authorUrl }],
   alternates: { canonical: SITE.url },
   robots: { index: true, follow: true, "max-image-preview": "large" },
