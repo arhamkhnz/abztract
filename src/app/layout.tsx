@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SITE } from "./_lib/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,11 +14,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://abztract.arhamkhnz.com"),
-  openGraph: { type: "website", siteName: "Abztract" },
-  twitter: { card: "summary_large_image" },
-  title: "Abztract — Make a mark",
-  description: "Create abstract symbols from a seed. Explore shapes, tune the details, and download SVG or PNG.",
+  metadataBase: new URL(SITE.url),
+  title: SITE.title,
+  description: SITE.description,
+  applicationName: SITE.name,
+  authors: [{ name: SITE.author, url: SITE.authorUrl }],
+  alternates: { canonical: SITE.url },
+  robots: { index: true, follow: true, "max-image-preview": "large" },
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+    url: SITE.url,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE.title,
+    description: SITE.description,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

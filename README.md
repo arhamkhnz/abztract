@@ -53,6 +53,14 @@ Use **Copy link** in DialKit or copy the browser address. Changes update the que
 
 Links can start with just a seed and family, for example `/?seed=hello&family=knot`. Missing geometry is derived from that seed; explicit settings in the URL take precedence. Numeric inputs are clamped to the supported ranges, and invalid selections or colors fall back to valid defaults. Opening a link or navigating back/forward restores its settings.
 
+## Search discovery
+
+`src/app/_lib/site.ts` holds the public site URL and search metadata. Next.js generates
+`/robots.txt` and `/sitemap.xml` as static files. The sitemap lists only the homepage;
+shared presets keep working and use the homepage as their canonical URL.
+
+After deployment, submit `https://abztract.arhamkhnz.com/sitemap.xml` in Google Search Console.
+
 ## Structure
 
 Everything for the single route is colocated under `src/app`:
