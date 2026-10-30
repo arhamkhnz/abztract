@@ -1,6 +1,7 @@
 import type { FamilyId, ShapeGenerator, ShapeSettings } from "../types";
 import { lissajous, orbit, rose, spiro, superShape, wave } from "./curves";
 import { cross, cubes, hex, maze, polygonRing } from "./geometric";
+import { panels } from "./panels";
 import { rubberBand } from "./rubber-band";
 import { offset, cutout } from "./marks";
 import { lattice } from "./lattice";
@@ -27,6 +28,7 @@ const generators: Record<FamilyId, ShapeGenerator> = {
   star,
   sun,
   "rubber-band": rubberBand,
+  panels,
   offset,
   cutout,
   polygon: polygonRing,

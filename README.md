@@ -1,6 +1,6 @@
 # Abztract
 
-Create abstract shapes from a seed. Explore 29 shape families, fine-tune the geometry, and export SVG or PNG.
+Create abstract shapes from a seed. Explore 30 shape families, fine-tune the geometry, and export SVG or PNG.
 
 [Try Abztract](https://abztract.arhamkhnz.com) · [Report a bug](https://github.com/arhamkhnz/abztract/issues)
 
@@ -12,7 +12,7 @@ Abztract started as an internal tool for exploring artwork during a project. It 
 
 Create abstract marks, geometric symbols, patterns, and line artwork. Start with a seed, explore variations, or adjust each setting yourself.
 
-- **29 shape families** across curves, loops, radial shapes, geometry, and textures.
+- **30 shape families** across curves, loops, radial shapes, geometry, and textures.
 - **Five styles:** outline, solid, double line, ribbon, and dashed.
 - **Live controls** for frequency, detail, phase, warp, stroke, colors, and line ends.
 - **Composition controls** for layers, spacing, rotated copies, aspect ratio, and overlays.
@@ -34,17 +34,19 @@ In **Export**, choose whether to include the background and select a PNG size: 1
 
 ### Shape families
 
-| Group | Families |
-| --- | --- |
-| Curves | Lissajous, Spirograph, Spiral, Swirl, Harmonograph, Rosette, Orbit, Soft star, Soft polygon |
-| Loops | Knot, Weave, Loop wreath |
-| Radial | Pinwheel, Diamonds, Star, Sunburst |
-| Geometry | Rubber band, Offset, Cutout, Polygon ring, Cross, Steps, Lattice, Honeycomb, Cubes |
-| Textures | Rings, Line disc, Beads, String art |
+| Group    | Families                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------- |
+| Curves   | Lissajous, Spirograph, Spiral, Swirl, Harmonograph, Rosette, Orbit, Soft star, Soft polygon |
+| Loops    | Knot, Weave, Loop wreath                                                                    |
+| Radial   | Pinwheel, Diamonds, Star, Sunburst                                                          |
+| Geometry | Panels, Rubber band, Offset, Cutout, Polygon ring, Cross, Steps, Lattice, Honeycomb, Cubes  |
+| Textures | Rings, Line disc, Beads, String art                                                         |
 
 Frequency and Detail control different properties for each family. For example, they set turns and arms for Spiral, and rotated grids and grid density for Lattice.
 
 For **Rubber band**, Frequency sets the number of grid rows. Detail 1–4 creates free layouts, 5–8 mirrors one axis, and 9–12 mirrors both axes. Phase changes the pin arrangement; Warp adjusts the pin radius.
+
+For **Panels**, Frequency sets the panel count from 1 to 16, Detail controls corner radius, Phase adjusts split proportions, and Warp sets the gap between panels. With two or more panels, it keeps one full-height sidebar and divides the content area into smaller panes. Gaps scale with panel size, and stroke widths adapt to keep neighboring panes separate. Randomize uses 3–7 panels and keeps the layout upright.
 
 ## Sharing artwork
 
@@ -77,15 +79,15 @@ Open [localhost:3000](http://localhost:3000). No API keys or environment variabl
 
 ## Development commands
 
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Start the development server |
-| `npm run build` | Build and export the site to `out/` |
-| `npm run lint` | Check code with Oxlint |
-| `npm run lint:fix` | Apply automatic lint fixes, including suggestions and unsafe fixes |
-| `npm run format` | Format files with Oxfmt |
-| `npm run format:check` | Check formatting without changing files |
-| `npm run fix` | Run lint fixes, then format files |
+| Command                | What it does                                                       |
+| ---------------------- | ------------------------------------------------------------------ |
+| `npm run dev`          | Start the development server                                       |
+| `npm run build`        | Build and export the site to `out/`                                |
+| `npm run lint`         | Check code with Oxlint                                             |
+| `npm run lint:fix`     | Apply automatic lint fixes, including suggestions and unsafe fixes |
+| `npm run format`       | Format files with Oxfmt                                            |
+| `npm run format:check` | Check formatting without changing files                            |
+| `npm run fix`          | Run lint fixes, then format files                                  |
 
 ## How it works
 
@@ -135,9 +137,9 @@ The included `wrangler.jsonc` serves `out/` through Workers Static Assets.
 
 For a Git-connected Cloudflare build:
 
-| Setting | Value |
-| --- | --- |
-| Build command | `npm run build` |
+| Setting        | Value                 |
+| -------------- | --------------------- |
+| Build command  | `npm run build`       |
 | Deploy command | `npx wrangler deploy` |
 
 For a manual deployment:

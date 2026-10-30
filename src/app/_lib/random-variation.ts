@@ -27,6 +27,7 @@ function density(settings: ShapeSettings) {
   if (family === "spiral" || family === "swirl") return (frequency * detail) / 128;
   if (family === "lattice") return (frequency * detail) / 72;
   if (family === "harmonograph") return (frequency * detail) / 64;
+  if (family === "panels") return frequency / 8;
   if (family === "rings") return (frequency * detail) / 120;
   if (family === "beads") return (frequency * detail) / 56;
   if (family === "stripes") return (frequency * detail) / 48;
@@ -39,6 +40,9 @@ function geometryDifference(a: ShapeSettings, b: ShapeSettings) {
   const frequency = Math.abs(a.frequency - b.frequency) / Math.max(1, ranges.frequency[1] - ranges.frequency[0]);
   const detail = Math.abs(a.detail - b.detail) / Math.max(1, ranges.detail[1] - ranges.detail[0]);
   const warp = Math.abs(a.warp - b.warp) / 0.8;
+  if (a.family === "panels") {
+    return frequency * 0.6 + detail * 0.1 + warp * 0.15 + (Math.abs(a.phase - b.phase) / 360) * 0.15;
+  }
   if (LOGO_FAMILIES.includes(a.family)) {
     const changedMotif = Math.floor((a.detail - 1) / 3) !== Math.floor((b.detail - 1) / 3);
     return frequency * 0.35 + (changedMotif ? 0.4 : 0) + detail * 0.1 + warp * 0.15;
@@ -50,7 +54,7 @@ function geometryDifference(a: ShapeSettings, b: ShapeSettings) {
 function variationFromSeed(seed: string, family: FamilyId, current: ShapeSettings): ShapeSettings {
   const random = seededRandom(`appearance:${family}:${seed}`);
   const definition = getFamily(family);
-  const logoFamily = LOGO_FAMILIES.includes(family);
+  const logoFamily = LOGO_FAMILIES.includes(family) || family === "panels";
   const styles: ShapeStyle[] = logoFamily
     ? ["solid", "solid", "solid", "outline", "double"]
     : LINE_FAMILIES.includes(family)
@@ -70,8 +74,8 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
     aspect: random() < 0.25 ? Math.round((0.85 + random() * 0.3) * 100) / 100 : 1,
   };
   if (logoFamily) {
-    settings.phase = 0;
-    settings.rotation = Math.floor(random() * 8) * 45;
+    if (family !== "panels") settings.phase = 0;
+    settings.rotation = family === "panels" ? 0 : Math.floor(random() * 8) * 45;
     settings.aspect = 1;
   }
   // Preserve the intended symmetry of these geometric layouts.

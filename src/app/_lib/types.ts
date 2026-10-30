@@ -22,6 +22,7 @@ export type FamilyId =
   | "shards"
   | "star"
   | "sun"
+  | "panels"
   | "offset"
   | "rubber-band"
   | "cutout"

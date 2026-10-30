@@ -1,14 +1,16 @@
 import { generatePaths } from "./generators";
 import { fitPaths, toPathData } from "./geometry";
+import { panelStrokeWidth } from "./panel-stroke";
 import type { ShapePath, ShapeSettings } from "./types";
 
 function renderPaths(paths: ShapePath[], settings: ShapeSettings, id: string): string {
-  const width = settings.style === "woven" ? Math.max(4, settings.stroke) : settings.stroke;
+  const requestedWidth = settings.style === "woven" ? Math.max(4, settings.stroke) : settings.stroke;
+  const width = settings.family === "panels" ? panelStrokeWidth(paths, settings) : requestedWidth;
   const attributes = `stroke="currentColor" stroke-width="${width.toFixed(2)}" stroke-linecap="${settings.cap}" stroke-linejoin="round"`;
 
   if (settings.style === "double") {
-    const outer = Math.max(5, width * 3);
-    const inner = Math.max(0.7, outer - width * 2);
+    const outer = settings.family === "panels" ? width * 3 : Math.max(5, width * 3);
+    const inner = settings.family === "panels" ? width : Math.max(0.7, outer - width * 2);
     const definitions = paths.map((path, index) => `<path id="${id}-path-${index}" d="${toPathData(path)}"/>`).join("");
     const mask = paths
       .map(
