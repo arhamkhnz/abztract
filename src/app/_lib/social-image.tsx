@@ -16,7 +16,7 @@ type Specimen = readonly [family: FamilyId, settings: Partial<ShapeSettings>];
 // Alternate 12 original curve/radial examples with 12 newer logo constructions.
 const specimens: Specimen[] = [
   ["harmonograph", { frequency: 3, detail: 2, phase: 60, warp: 0.3, stroke: 4 }],
-  ["joined", { style: "solid", stroke: 0.5, frequency: 6, detail: 2, phase: 0, warp: 0.38 }],
+  ["arc-motifs", { style: "solid", stroke: 0.5, frequency: 3, detail: 2, phase: 30, warp: 0.3 }],
   ["sun", { style: "solid", stroke: 0.5, frequency: 9, detail: 4, phase: 20, warp: 0.35 }],
   ["offset-rings", { style: "solid", stroke: 0.5, frequency: 8, detail: 8, phase: 225, warp: 0.4 }],
   ["spiral", { frequency: 5, detail: 1, phase: 0, warp: 0.35, stroke: 4 }],
