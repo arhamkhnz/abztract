@@ -42,6 +42,8 @@ export function useGenerator(onAction?: (action: string, values: GeneratorValues
         detail: next.detail,
         phase: next.phase,
         warp: next.warp,
+        centerSize: next.centerSize,
+        frameThickness: next.frameThickness,
       },
       finish: { stroke: next.stroke },
       composition: {
@@ -92,16 +94,17 @@ export function useGenerator(onAction?: (action: string, values: GeneratorValues
         familyChanged || values.keepFamily
           ? family
           : FAMILIES[Math.floor(seededRandom(values.seed)() * FAMILIES.length)];
+      const switchedFamily = familyChanged || nextFamily.id !== family.id;
       previous.current.family = nextFamily.id;
       setValues({
         shape: {
           family: nextFamily.id,
           ...settingsFromSeed(values.seed, nextFamily.id),
-          ...(familyChanged || nextFamily.id !== family.id ? { style: nextFamily.style } : {}),
+          ...(switchedFamily ? { style: nextFamily.style } : {}),
         },
-        ...(familyChanged
+        ...(switchedFamily
           ? {
-              finish: { stroke: family.stroke },
+              finish: { stroke: nextFamily.stroke },
               composition: { layers: 1, copies: 1, rotation: 0, aspect: 1, overlay: "none" },
             }
           : {}),

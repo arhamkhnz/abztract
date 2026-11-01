@@ -33,9 +33,19 @@ export function greatestCommonDivisor(a: number, b: number): number {
   return b ? greatestCommonDivisor(b, a % b) : a;
 }
 
-export function toPathData({ points, closed }: ShapePath): string {
+export function mapPathPoints(path: ShapePath, transform: (point: Point) => Point): ShapePath {
+  return {
+    ...path,
+    points: path.points.map(transform),
+    ...(path.holes ? { holes: path.holes.map((hole) => hole.map(transform)) } : {}),
+  };
+}
+
+export function toPathData({ points, closed, holes }: ShapePath): string {
   return (
-    points.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`).join("") + (closed ? "Z" : "")
+    points.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`).join("") +
+    (closed ? "Z" : "") +
+    (holes?.map((points) => toPathData({ points, closed: true })).join("") ?? "")
   );
 }
 
@@ -55,15 +65,36 @@ export function fitPaths(paths: ShapePath[], settings: ShapeSettings, layer = 0)
   }
 
   const size = Math.max(maxX - minX, maxY - minY, 0.01);
-  const scale = (354 / size) * Math.max(0.1, 1 - layer * settings.spacing);
   const centerX = (minX + maxX) / 2;
   const centerY = (minY + maxY) / 2;
+  const rotations = Array.from({ length: settings.copies }, (_, copy) => {
+    const angle = (settings.rotation * Math.PI) / 180 + (TAU * copy) / settings.copies;
+    return [Math.cos(angle), Math.sin(angle)] as const;
+  });
+  let rotatedExtent = 0;
+  for (const { points } of paths) {
+    for (const [x, y] of points) {
+      const dx = x * settings.aspect - centerX;
+      const dy = y - centerY;
+      for (const [cos, sin] of rotations) {
+        rotatedExtent = Math.max(rotatedExtent, Math.abs(dx * cos - dy * sin), Math.abs(dx * sin + dy * cos));
+      }
+    }
+  }
+  // Bound the requested stroke conservatively; clearance limits can only make
+  // it thinner. Round joins extend by half the width; square caps need more.
+  const width = settings.style === "woven" ? Math.max(4, settings.stroke) : settings.stroke;
+  const outerWidth = settings.style === "double" ? Math.max(5, width * 3) : width;
+  const strokeExtent = outerWidth * (settings.cap === "square" ? Math.SQRT1_2 : 0.5);
+  const available = Math.max(1, CENTER - 1 - strokeExtent);
+  const baseScale = Math.min(354 / size, available / Math.max(rotatedExtent, 0.005));
+  const scale = baseScale * Math.max(0.1, 1 - layer * settings.spacing);
 
   return paths.map((path): ShapePath => ({
-    ...path,
-    points: path.points.map(([x, y]): Point => [
+    ...mapPathPoints(path, ([x, y]) => [
       CENTER + (x * settings.aspect - centerX) * scale,
       CENTER + (y - centerY) * scale,
     ]),
+    ...(path.clearance !== undefined ? { clearance: path.clearance * scale * Math.min(settings.aspect, 1) } : {}),
   }));
 }

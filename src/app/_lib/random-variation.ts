@@ -18,8 +18,25 @@ const LINE_FAMILIES: FamilyId[] = [
   "rings",
   "stripes",
   "chords",
+  "curve-fan",
 ];
-const LOGO_FAMILIES: FamilyId[] = ["offset", "cutout"];
+const CLEAN_LOGO_FAMILIES: FamilyId[] = [
+  "modules",
+  "joined",
+  "spokes",
+  "split-disc",
+  "radial-bands",
+  "soft-branches",
+  "bloom",
+  "offset-rings",
+  "dotted",
+  "crescents",
+  "perforated",
+  "arc-motifs",
+  "layered",
+  "badge",
+];
+const LOGO_FAMILIES: FamilyId[] = ["offset", "cutout", ...CLEAN_LOGO_FAMILIES];
 const FINE_FAMILIES: FamilyId[] = ["spiral", "swirl", "harmonograph", "lattice", "chords"];
 
 function density(settings: ShapeSettings) {
@@ -40,8 +57,33 @@ function geometryDifference(a: ShapeSettings, b: ShapeSettings) {
   const frequency = Math.abs(a.frequency - b.frequency) / Math.max(1, ranges.frequency[1] - ranges.frequency[0]);
   const detail = Math.abs(a.detail - b.detail) / Math.max(1, ranges.detail[1] - ranges.detail[0]);
   const warp = Math.abs(a.warp - b.warp) / 0.8;
+  if (a.family === "layered") {
+    return (
+      (a.frequency !== b.frequency ? 0.55 : 0) + detail * 0.2 + warp * 0.15 + (Math.abs(a.phase - b.phase) / 360) * 0.1
+    );
+  }
+  if (a.family === "modules" || a.family === "joined") {
+    const layoutChanged = Math.floor(a.phase / 45) !== Math.floor(b.phase / 45);
+    return frequency * 0.35 + detail * 0.2 + warp * 0.15 + (layoutChanged ? 0.3 : 0);
+  }
   if (a.family === "panels") {
     return frequency * 0.6 + detail * 0.1 + warp * 0.15 + (Math.abs(a.phase - b.phase) / 360) * 0.15;
+  }
+  if (a.family === "bloom" || a.family === "split-disc" || a.family === "radial-bands") {
+    const changedMotif = Math.floor((a.detail - 1) / 4) !== Math.floor((b.detail - 1) / 4);
+    return frequency * 0.35 + (changedMotif ? 0.3 : 0) + detail * 0.15 + warp * 0.2;
+  }
+  if (
+    ["offset-rings", "dotted", "crescents", "perforated", "arc-motifs", "layered", "badge", "curve-fan"].includes(
+      a.family,
+    )
+  ) {
+    return frequency * 0.4 + detail * 0.4 + warp * 0.2;
+  }
+  if (a.family === "soft-branches") return frequency * 0.55 + detail * 0.25 + warp * 0.2;
+  if (a.family === "spokes") {
+    const changedRhythm = Math.floor((a.detail - 1) / 4) !== Math.floor((b.detail - 1) / 4);
+    return frequency * 0.45 + (changedRhythm ? 0.35 : 0) + detail * 0.05 + warp * 0.15;
   }
   if (LOGO_FAMILIES.includes(a.family)) {
     const changedMotif = Math.floor((a.detail - 1) / 3) !== Math.floor((b.detail - 1) / 3);
@@ -55,12 +97,20 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
   const random = seededRandom(`appearance:${family}:${seed}`);
   const definition = getFamily(family);
   const logoFamily = LOGO_FAMILIES.includes(family) || family === "panels";
-  const styles: ShapeStyle[] = logoFamily
-    ? ["solid", "solid", "solid", "outline", "double"]
-    : LINE_FAMILIES.includes(family)
-      ? ["outline", "outline", "outline", "double", "dashed"]
-      : ["outline", "outline", "solid", "solid", "double"];
-  const style = random() < 0.45 ? definition.style : styles[Math.floor(random() * styles.length)];
+  const cleanLogo = CLEAN_LOGO_FAMILIES.includes(family);
+  const styles: ShapeStyle[] = cleanLogo
+    ? ["solid", "solid", "solid", "solid", "outline"]
+    : logoFamily
+      ? ["solid", "solid", "solid", "outline", "double"]
+      : LINE_FAMILIES.includes(family)
+        ? ["outline", "outline", "outline", "double", "dashed"]
+        : ["outline", "outline", "solid", "solid", "double"];
+  const style =
+    family === "spokes" || family === "layered" || family === "badge"
+      ? "solid"
+      : random() < 0.45
+        ? definition.style
+        : styles[Math.floor(random() * styles.length)];
   const geometry = settingsFromSeed(seed, family);
   const settings: ShapeSettings = {
     ...DEFAULT_SETTINGS,
@@ -74,12 +124,37 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
     aspect: random() < 0.25 ? Math.round((0.85 + random() * 0.3) * 100) / 100 : 1,
   };
   if (logoFamily) {
-    if (family !== "panels") settings.phase = 0;
-    settings.rotation = family === "panels" ? 0 : Math.floor(random() * 8) * 45;
+    if (!["panels", "modules", "joined", "bloom", "offset-rings", "layered", "badge"].includes(family))
+      settings.phase = 0;
+    settings.rotation = [
+      "panels",
+      "modules",
+      "joined",
+      "crescents",
+      "dotted",
+      "perforated",
+      "layered",
+      "badge",
+    ].includes(family)
+      ? 0
+      : Math.floor(random() * 8) * 45;
     settings.aspect = 1;
+    if (family === "spokes") settings.warp = Math.round((0.08 + random() * 0.3) * 100) / 100;
+  }
+  if (family === "layered" && current.family === "layered") {
+    const construction = Math.max(1, Math.min(4, Math.round(current.frequency)));
+    const alternatives = [1, 2, 3, 4].filter((value) => value !== construction);
+    settings.frequency = alternatives[Math.floor(random() * alternatives.length)];
   }
   // Preserve the intended symmetry of these geometric layouts.
   if (family === "cubes" || family === "rubber-band") settings.aspect = 1;
+  if (family === "curve-fan") {
+    settings.style = "outline";
+    settings.rotation = 0;
+    settings.aspect = 1;
+    settings.layers = 1;
+    settings.copies = 1;
+  }
   const complexity = density(settings);
   const baseStroke = FINE_FAMILIES.includes(family)
     ? Math.max(0.5, 1.8 - complexity * 1.2)
@@ -89,8 +164,18 @@ function variationFromSeed(seed: string, family: FamilyId, current: ShapeSetting
       (style === "solid" ? 1 : style === "double" ? Math.min(3, baseStroke) : baseStroke * (0.75 + random() * 0.5)) *
         10,
     ) / 10;
-  settings.stroke = Math.max(0.5, Math.min(14, settings.stroke));
-  if (!logoFamily && family !== "rubber-band" && complexity < 0.4 && style !== "solid" && random() < 0.22) {
+  settings.stroke =
+    family === "spokes" || family === "layered" || family === "badge"
+      ? 0.5
+      : Math.max(0.5, Math.min(14, settings.stroke));
+  if (
+    !logoFamily &&
+    family !== "rubber-band" &&
+    family !== "curve-fan" &&
+    complexity < 0.4 &&
+    style !== "solid" &&
+    random() < 0.22
+  ) {
     settings.layers = 2;
     settings.spacing = Math.round((0.1 + random() * 0.12) * 100) / 100;
   }

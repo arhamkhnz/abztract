@@ -70,7 +70,8 @@ export function Generator() {
 
   return (
     <main
-      className="relative min-h-svh"
+      className="relative min-h-svh [body:has(&[data-badge-controls=false])_.dialkit-slider-wrapper:has([aria-label='Center_Size'],[aria-label='Frame_Thickness'])]:hidden"
+      data-badge-controls={settings.family === "badge" || settings.overlay === "badge"}
       style={{ background: settings.background }}
       aria-label="Abztract shape generator"
     >

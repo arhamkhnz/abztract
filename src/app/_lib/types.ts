@@ -3,6 +3,9 @@ export type Point = readonly [number, number];
 export interface ShapePath {
   points: Point[];
   closed: boolean;
+  holes?: Point[][];
+  // Minimum gap or wall thickness in the same coordinates as the points.
+  clearance?: number;
 }
 
 export type FamilyId =
@@ -22,6 +25,21 @@ export type FamilyId =
   | "shards"
   | "star"
   | "sun"
+  | "split-disc"
+  | "radial-bands"
+  | "soft-branches"
+  | "bloom"
+  | "offset-rings"
+  | "dotted"
+  | "crescents"
+  | "curve-fan"
+  | "perforated"
+  | "arc-motifs"
+  | "badge"
+  | "layered"
+  | "modules"
+  | "joined"
+  | "spokes"
   | "panels"
   | "offset"
   | "rubber-band"
@@ -47,6 +65,8 @@ export interface ShapeSettings {
   detail: number;
   phase: number;
   warp: number;
+  centerSize: number;
+  frameThickness: number;
   stroke: number;
   aspect: number;
   layers: number;

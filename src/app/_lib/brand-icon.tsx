@@ -9,6 +9,8 @@ const logo: ShapeSettings = {
   detail: 3,
   phase: 20,
   warp: 0.65,
+  centerSize: 0.6,
+  frameThickness: 1,
   stroke: 1,
   aspect: 1,
   layers: 1,

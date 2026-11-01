@@ -30,6 +30,8 @@ export const DIAL_CONFIG = {
     detail: [DEFAULT_SETTINGS.detail, 1, 12, 1],
     phase: [DEFAULT_SETTINGS.phase, 0, 360, 1],
     warp: [DEFAULT_SETTINGS.warp, 0, 0.8, 0.01],
+    centerSize: [DEFAULT_SETTINGS.centerSize, 0.25, 0.9, 0.01],
+    frameThickness: [DEFAULT_SETTINGS.frameThickness, 0.4, 1.5, 0.01],
   },
   finish: {
     stroke: [DEFAULT_SETTINGS.stroke, 0.5, 14, 0.1],
@@ -72,6 +74,8 @@ export function toShapeSettings(values: GeneratorValues): ShapeSettings {
     detail: Math.round(values.shape.detail),
     phase: values.shape.phase,
     warp: values.shape.warp,
+    centerSize: values.shape.centerSize,
+    frameThickness: values.shape.frameThickness,
     stroke: values.finish.stroke,
     aspect: values.composition.aspect,
     layers: Math.round(values.composition.layers),

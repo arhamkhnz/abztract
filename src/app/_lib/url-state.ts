@@ -69,6 +69,8 @@ export function readGeneratorQuery(params: URLSearchParams): SharedGeneratorStat
       detail: readNumber(params, "detail", DIAL_CONFIG.shape.detail, geometry.detail),
       phase: readNumber(params, "phase", DIAL_CONFIG.shape.phase, geometry.phase),
       warp: readNumber(params, "warp", DIAL_CONFIG.shape.warp, geometry.warp),
+      centerSize: readNumber(params, "centerSize", DIAL_CONFIG.shape.centerSize),
+      frameThickness: readNumber(params, "frameThickness", DIAL_CONFIG.shape.frameThickness),
     },
     finish: {
       stroke: readNumber(
@@ -108,6 +110,8 @@ export function createShareUrl(href: string, values: SharedGeneratorState): URL 
     detail: values.shape.detail,
     phase: values.shape.phase,
     warp: values.shape.warp,
+    centerSize: values.shape.centerSize,
+    frameThickness: values.shape.frameThickness,
     stroke: values.finish.stroke,
     color: values.finish.color,
     background: values.finish.background,

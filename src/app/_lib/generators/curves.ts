@@ -1,12 +1,22 @@
 import { circle, greatestCommonDivisor, sampleCurve, TAU } from "../geometry";
 import type { ShapeGenerator, ShapePath } from "../types";
 
-export const lissajous: ShapeGenerator = ({ frequency, detail, phase, warp }) => [
-  sampleCurve((angle) => {
-    const scale = 1 + warp * 0.36 * Math.cos(2 * angle);
-    return [Math.sin(frequency * angle + (phase * Math.PI) / 180) * scale, Math.sin(detail * angle) * scale];
-  }, 1200),
-];
+export const lissajous: ShapeGenerator = ({ frequency, detail, phase, warp }) => {
+  const rhythm = greatestCommonDivisor(frequency, detail);
+  // The warp adds a frequency-2 modulation. Include it when finding the true
+  // period so Solid never cancels itself by tracing an identical loop twice.
+  const repeats = warp === 0 ? rhythm : greatestCommonDivisor(rhythm, 2);
+  return [
+    sampleCurve(
+      (angle) => {
+        const scale = 1 + warp * 0.36 * Math.cos(2 * angle);
+        return [Math.sin(frequency * angle + (phase * Math.PI) / 180) * scale, Math.sin(detail * angle) * scale];
+      },
+      Math.ceil(1200 / repeats),
+      TAU / repeats,
+    ),
+  ];
+};
 
 export const spiro: ShapeGenerator = ({ frequency, detail, phase, warp }) => {
   const distance = detail * (0.2 + warp * 2.8);
@@ -77,7 +87,7 @@ export const superShape: ShapeGenerator = ({ frequency, detail, phase, warp }) =
       );
       return [radius * Math.cos(angle), radius * Math.sin(angle)];
     },
-    1200,
-    TAU * 2,
+    600,
+    TAU,
   ),
 ];

@@ -2,6 +2,7 @@ import { greatestCommonDivisor } from "./geometry";
 import { RANDOM_RANGES } from "./random-ranges";
 import type { FamilyId } from "./types";
 
+// FNV-1a-style hashing of Unicode code points, kept stable for existing seeds.
 function hashText(text: string): number {
   let hash = 2166136261;
   for (const character of text) {
@@ -11,6 +12,7 @@ function hashText(text: string): number {
   return hash >>> 0;
 }
 
+// Mulberry32 keeps the random sequence repeatable for a given seed.
 export function seededRandom(seed: string) {
   let value = hashText(seed);
   return () => {

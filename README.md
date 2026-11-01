@@ -1,6 +1,6 @@
 # Abztract
 
-Create abstract shapes from a seed. Explore 30 shape families, fine-tune the geometry, and export SVG or PNG.
+Create abstract shapes from a seed. Explore 45 shape families, fine-tune the geometry, and export SVG or PNG.
 
 [Try Abztract](https://abztract.arhamkhnz.com) · [Report a bug](https://github.com/arhamkhnz/abztract/issues)
 
@@ -12,7 +12,7 @@ Abztract started as an internal tool for exploring artwork during a project. It 
 
 Create abstract marks, geometric symbols, patterns, and line artwork. Start with a seed, explore variations, or adjust each setting yourself.
 
-- **30 shape families** across curves, loops, radial shapes, geometry, and textures.
+- **45 shape families** across curves, loops, radial shapes, geometry, and textures.
 - **Five styles:** outline, solid, double line, ribbon, and dashed.
 - **Live controls** for frequency, detail, phase, warp, stroke, colors, and line ends.
 - **Composition controls** for layers, spacing, rotated copies, aspect ratio, and overlays.
@@ -34,17 +34,27 @@ In **Export**, choose whether to include the background and select a PNG size: 1
 
 ### Shape families
 
-| Group    | Families                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------- |
-| Curves   | Lissajous, Spirograph, Spiral, Swirl, Harmonograph, Rosette, Orbit, Soft star, Soft polygon |
-| Loops    | Knot, Weave, Loop wreath                                                                    |
-| Radial   | Pinwheel, Diamonds, Star, Sunburst                                                          |
-| Geometry | Panels, Rubber band, Offset, Cutout, Polygon ring, Cross, Steps, Lattice, Honeycomb, Cubes  |
-| Textures | Rings, Line disc, Beads, String art                                                         |
+| Group    | Count | Families                                                                                                                                                                                        |
+| -------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Curves   | 9     | Lissajous, Spirograph, Spiral, Swirl, Harmonograph, Rosette, Orbit, Soft star, Soft polygon                                                                                                     |
+| Loops    | 3     | Knot, Weave, Loop wreath                                                                                                                                                                        |
+| Radial   | 9     | Pinwheel, Diamonds, Star, Sunburst, Spokes, Split disc, Radial bands, Soft branches, Cutout bloom                                                                                               |
+| Geometry | 20    | Badge, Layered, Offset rings, Dotted, Crescents, Curve fan, Perforated, Arc motifs, Modules, Joined, Panels, Rubber band, Offset, Cutout, Polygon ring, Cross, Steps, Lattice, Honeycomb, Cubes |
+| Textures | 4     | Rings, Line disc, Beads, String art                                                                                                                                                             |
 
 Frequency and Detail control different properties for each family. For example, they set turns and arms for Spiral, and rotated grids and grid density for Lattice.
 
 For **Rubber band**, Frequency sets the number of grid rows. Detail 1–4 creates free layouts, 5–8 mirrors one axis, and 9–12 mirrors both axes. Phase changes the pin arrangement; Warp adjusts the pin radius.
+
+For **Modules**, Frequency sets tile count (1–16), Detail selects squares, dots, quarter discs, quarter bands, half discs, or soft blocks and their layouts, Phase selects and turns composed layouts, and Warp changes the gaps. For **Joined**, the same grid becomes one continuous shape: Detail and Phase change its layout, and Warp rounds its corners. For **Spokes**, Frequency sets 2–16 rays, Detail selects composed ray lengths and angles, Phase turns the mark, and Warp controls ray thickness.
+
+For **Split disc**, Frequency sets the segment count, Detail changes the inner contour, and Warp changes the radial openings. **Radial bands** uses Detail for band count and curved, angular, or arrow motifs. **Soft branches** uses Detail for lobe shape and Warp for the central junction. **Cutout bloom** uses Detail to select a circular, star, or curved cutout, Warp for its size, and Phase for its rotation. Cutouts remain transparent in SVG and PNG exports. These families limit stroke width to preserve their gaps and inner walls.
+
+For **Offset rings**, Frequency sets ring count, Detail moves the shared focus, Warp changes band thickness, and Phase turns the focus. **Dotted** draws an isometric cube, nested hexagons, or a dot orbit; Frequency changes dot density and Warp changes dot size. **Crescents** uses Frequency for columns, Detail for rows, and Warp for crescent thickness. **Curve fan** controls curve count, bend, and focus; Detail 1–8 includes a square frame and 9–12 removes it. **Perforated** offers scalloped grids (Detail 1–4), stacked slots in a disc (5–8), and circular perforations (9–12). **Arc motifs** offers inward-facing arc bands (1–4), a framed concave mark (5–8), and an unframed mark (9–12).
+
+For **Badge**, Frequency sets frame sides (3–12), Detail sets central star points (3–12), Phase changes the star curvature, and Warp adjusts frame rounding and thickness. Detail 3 uses a flat-tipped, left-facing three-arm centre; Detail 4 creates a curved four-point star. Center Size adjusts the central mark relative to the opening (0.25–0.9), and Frame Thickness scales the frame wall (0.4–1.5). Both controls appear only when Badge is the main family or overlay, and both are shared in the URL. Existing URLs default to 0.6 and 1, preserving their proportions. The circular opening stays transparent.
+
+For **Layered**, Frequency selects four distinct constructions: curved sheets (1), paired corners (2), opposing planes (3), or paired arches (4). Detail controls weight and softness, Phase adjusts the internal balance, and Warp controls the separating gap. Randomize keeps these marks solid and upright, and chooses a different construction from the current one.
 
 For **Panels**, Frequency sets the panel count from 1 to 16, Detail controls corner radius, Phase adjusts split proportions, and Warp sets the gap between panels. With two or more panels, it keeps one full-height sidebar and divides the content area into smaller panes. Gaps scale with panel size, and stroke widths adapt to keep neighboring panes separate. Randomize uses 3–7 panels and keeps the layout upright.
 
@@ -91,7 +101,7 @@ Open [localhost:3000](http://localhost:3000). No API keys or environment variabl
 
 ## How it works
 
-The seed produces repeatable geometry settings for the selected family. Each family has a generator that returns paths made from points. A shared renderer fits those paths to the canvas and applies the selected style, layers, copies, and overlays.
+The seed produces repeatable geometry settings for the selected family. Each family has a generator that returns paths made from points, with optional inner contours for transparent cutouts. A shared renderer fits those paths to the canvas and applies the selected style, layers, copies, and overlays.
 
 The preview and exports use the same SVG geometry. PNG export renders that SVG into a browser canvas at the selected size. Generation and downloads happen in the browser.
 
@@ -119,7 +129,17 @@ src/app/
 └── sitemap.ts        Sitemap
 ```
 
-To add a family, implement its generator and register it in `types.ts`, `families.ts`, `generators/index.ts`, and `random-ranges.ts`. Review its styles and density handling in `random-variation.ts` so Randomize produces useful results.
+To add a family, implement its generator and register it in `types.ts`, `families.ts`, `generators/index.ts`, and `random-ranges.ts`. Review its styles and density handling in `random-variation.ts` so Randomize produces useful results. Update the README count and family table too. Search and social descriptions derive their count from `FAMILY_COUNT` in `families.ts`.
+
+When transforming a path with cutouts, use `mapPathPoints` so its outer and inner contours stay aligned. The fitting step reserves room for rotated copies and stroke widths.
+
+### Algorithm references and provenance
+
+The shape generators use mathematical curves, grid boundaries, polygon construction, and sampled Bezier curves. The recent generator additions were implemented locally from visual references; they do not import implementation code or logo assets from the reference sites. Similar-looking output is still possible, so generated marks are not guaranteed unique.
+
+Seeds use FNV-1a-style string hashing and Mulberry32 pseudorandom number generation for repeatable results.
+
+The Oxlint and Oxfmt settings are shared with [TenderLayer](https://github.com/arhamkhnz/tenderlayer). Next.js, React, Tailwind CSS, DialKit, Motion, and other dependencies retain their own licenses.
 
 ## Deployment
 
