@@ -1,85 +1,90 @@
 import { ImageResponse } from "next/og";
 import { DEFAULT_SETTINGS, familySettings } from "./families";
 import { renderSymbol } from "./render-symbol";
-import { seededRandom, settingsFromSeed } from "./seed";
-import type { FamilyId, ShapeSettings, ShapeStyle } from "./types";
+import type { FamilyId, ShapeSettings } from "./types";
 
+const WIDTH = 1200;
+const HEIGHT = 630;
 const SIDE_MARGIN = 54;
 const VERTICAL_MARGIN = 36;
-const GRID_HEIGHT = 630 - VERTICAL_MARGIN * 2;
-const GRID_TOP = VERTICAL_MARGIN;
 const ROWS = 4;
+const MARK_SIZE = 128;
 
-type Specimen = readonly [family: FamilyId, seed: string, style?: ShapeStyle];
+type Specimen = readonly [family: FamilyId, settings: Partial<ShapeSettings>];
 
+// Explicit compositions keep the public preview stable as seed tuning evolves.
+// Alternate 12 original curve/radial examples with 12 newer logo constructions.
 const specimens: Specimen[] = [
-  ["harmonograph", "after-hours"],
-  ["sun", "confetti", "solid"],
-  ["spiral", "vinyl"],
-  ["hex", "hive"],
-  ["petals", "paperclips", "double"],
-  ["cubes", "playblocks"],
-  ["chords", "cat-cradle"],
-  ["pinwheel", "whirligig", "solid"],
-  ["super", "pillow"],
-  ["weave", "tangled"],
-  ["rose", "wildflower", "solid"],
-  ["knot", "pretzel", "double"],
-  ["lattice", "crystal"],
-  ["rings", "echo"],
-  ["lissajous", "swing"],
-  ["wave", "puddle", "solid"],
-  ["shards", "sprinkles", "solid"],
-  ["swirl", "whirlpool"],
-  ["cross", "snowflake", "double"],
-  ["beads", "bubbles"],
-  ["maze", "detour"],
-  ["orbit", "satellite"],
-  ["polygon", "origami"],
-  ["star", "stardust", "solid"],
+  ["harmonograph", { frequency: 3, detail: 2, phase: 60, warp: 0.3, stroke: 4 }],
+  ["joined", { style: "solid", stroke: 0.5, frequency: 6, detail: 2, phase: 0, warp: 0.38 }],
+  ["sun", { style: "solid", stroke: 0.5, frequency: 9, detail: 4, phase: 20, warp: 0.35 }],
+  ["offset-rings", { style: "solid", stroke: 0.5, frequency: 8, detail: 8, phase: 225, warp: 0.4 }],
+  ["spiral", { frequency: 5, detail: 1, phase: 0, warp: 0.35, stroke: 4 }],
+  ["badge", { frequency: 6, detail: 3, phase: 60, warp: 0.55, centerSize: 0.72, frameThickness: 0.8 }],
+  ["modules", { frequency: 4, detail: 7, phase: 0, warp: 0.1 }],
+  ["hex", { frequency: 6, detail: 2, phase: 0, warp: 0.12 }],
+  ["bloom", { frequency: 6, detail: 6, phase: 0, warp: 0.45 }],
+  ["petals", { frequency: 6, detail: 3, phase: 15, warp: 0.3 }],
+  ["dotted", { style: "solid", stroke: 0.5, frequency: 5, detail: 1, phase: 0, warp: 0.55 }],
+  ["cubes", { frequency: 3, detail: 2, phase: 0, warp: 0.55 }],
+  ["pinwheel", { frequency: 7, detail: 5, phase: 60, warp: 0.25 }],
+  ["crescents", { style: "solid", stroke: 0.5, frequency: 3, detail: 3, phase: 0, warp: 0.6 }],
+  ["super", { frequency: 6, detail: 5, phase: 0, warp: 0.25, stroke: 4 }],
+  ["layered", { style: "solid", stroke: 0.5, frequency: 3, detail: 5, phase: 180, warp: 0.2 }],
+  ["rings", { frequency: 5, detail: 1, phase: 0, warp: 0, stroke: 4 }],
+  ["perforated", { frequency: 3, detail: 3, phase: 0, warp: 0.65 }],
+  ["curve-fan", { frequency: 10, detail: 2, phase: 0, warp: 0.45 }],
+  ["weave", { frequency: 3, detail: 5, phase: 20, warp: 0.35 }],
+  ["radial-bands", { frequency: 3, detail: 2, phase: 30, warp: 0.3 }],
+  ["lissajous", { frequency: 3, detail: 4, phase: 90, warp: 0, stroke: 4 }],
+  ["split-disc", { frequency: 6, detail: 2, phase: 15, warp: 0.3 }],
+  ["chords", { frequency: 5, detail: 2, phase: 0, warp: 0, stroke: 2.5 }],
 ];
 
 const COLUMNS = Math.ceil(specimens.length / ROWS);
-const CELL_WIDTH = (1200 - SIDE_MARGIN * 2) / COLUMNS;
+const CELL_WIDTH = (WIDTH - SIDE_MARGIN * 2) / COLUMNS;
+const CELL_HEIGHT = (HEIGHT - VERTICAL_MARGIN * 2) / ROWS;
 
 function specimenSheet() {
   const grid: string[] = [];
   for (let column = 0; column <= COLUMNS; column++) {
     const x = SIDE_MARGIN + column * CELL_WIDTH;
-    grid.push(`<path d="M${x} ${GRID_TOP}V${GRID_TOP + GRID_HEIGHT}"/>`);
+    grid.push(`<path d="M${x} ${VERTICAL_MARGIN}V${HEIGHT - VERTICAL_MARGIN}"/>`);
   }
   for (let row = 0; row <= ROWS; row++) {
-    const y = GRID_TOP + row * (GRID_HEIGHT / ROWS);
-    grid.push(`<path d="M${SIDE_MARGIN} ${y}H${1200 - SIDE_MARGIN}"/>`);
+    const y = VERTICAL_MARGIN + row * CELL_HEIGHT;
+    grid.push(`<path d="M${SIDE_MARGIN} ${y}H${WIDTH - SIDE_MARGIN}"/>`);
   }
 
   const marks = specimens
-    .map(([family, seed, style = "outline"], index) => {
-      const random = seededRandom(`specimen:${seed}`);
-      const fineLines = ["spiral", "swirl", "harmonograph", "lattice", "chords"].includes(family);
+    .map(([family, configuration], index) => {
       const settings: ShapeSettings = {
         ...familySettings(family),
-        ...settingsFromSeed(seed, family),
-        style,
-        stroke: style === "solid" ? 1 : style === "double" ? 2 : fineLines ? 2.5 : 4,
-        rotation: Math.floor(random() * 360),
-        aspect: Math.round((0.8 + random() * 0.4) * 100) / 100,
-        layers: ["wave", "super", "maze"].includes(family) ? 1 + Math.floor(random() * 2) : 1,
+        style: "outline",
+        stroke: 3.5,
+        rotation: 0,
+        aspect: 1,
+        layers: 1,
+        copies: 1,
+        overlay: "none",
+        ...configuration,
       };
-      const x = SIDE_MARGIN + (index % COLUMNS) * CELL_WIDTH + (CELL_WIDTH - 128) / 2;
-      const y = GRID_TOP + (GRID_HEIGHT / ROWS - 128) / 2 + Math.floor(index / COLUMNS) * (GRID_HEIGHT / ROWS);
-      return `<g transform="translate(${x} ${y}) scale(0.256)" color="#a3a3a3">${renderSymbol(settings, `specimen-${index}`)}</g>`;
+      const x = SIDE_MARGIN + (index % COLUMNS) * CELL_WIDTH + (CELL_WIDTH - MARK_SIZE) / 2;
+      const y = VERTICAL_MARGIN + Math.floor(index / COLUMNS) * CELL_HEIGHT + (CELL_HEIGHT - MARK_SIZE) / 2;
+      return `<g transform="translate(${x} ${y}) scale(${MARK_SIZE / 500})">${renderSymbol(settings, `specimen-${index}`)}</g>`;
     })
     .join("");
 
-  // A black halo clears the grid around the white mark without adding a rectangular tile.
+  // Clear the background around the main mark with the same silhouette.
   const halo = renderSymbol({ ...DEFAULT_SETTINGS, stroke: 32 }, "hero-halo");
   const hero = renderSymbol(DEFAULT_SETTINGS, "hero");
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-    <rect width="1200" height="630" fill="#000000"/>
+  const heroSize = 440;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
+    <rect width="${WIDTH}" height="${HEIGHT}" fill="#000000"/>
     <g stroke="#202020" stroke-width="1" fill="none">${grid.join("")}</g>
-    ${marks}
-    <g transform="translate(380 ${GRID_TOP + GRID_HEIGHT / 2 - 220}) scale(0.88)">
+    <g color="#a3a3a3">${marks}</g>
+    <g transform="translate(${(WIDTH - heroSize) / 2} ${(HEIGHT - heroSize) / 2}) scale(${heroSize / 500})">
       <g color="#000000">${halo}</g>
       <g color="#ffffff">${hero}</g>
     </g>
@@ -89,9 +94,9 @@ function specimenSheet() {
 export function createSocialImage() {
   const source = `data:image/svg+xml;base64,${Buffer.from(specimenSheet()).toString("base64")}`;
   return new ImageResponse(
-    <div style={{ display: "flex", width: "100%", height: "100%", background: "#000000", color: "#ffffff" }}>
-      <img src={source} width={1200} height={630} alt="" />
+    <div style={{ display: "flex", width: "100%", height: "100%", background: "#000000" }}>
+      <img src={source} width={WIDTH} height={HEIGHT} alt="" />
     </div>,
-    { width: 1200, height: 630 },
+    { width: WIDTH, height: HEIGHT },
   );
 }
